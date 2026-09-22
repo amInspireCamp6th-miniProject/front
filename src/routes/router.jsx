@@ -13,6 +13,7 @@ import LoginPage from '../features/user/page/LoginPage'
 import MyPage from '../features/user/page/MyPage'
 import SignupPage from '../features/user/page/SignupPage'
 import TabBarLayout from '../components/layout/TabBarLayout'
+import SubLayout from '../components/layout/SubLayout'
 
 const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
@@ -24,13 +25,35 @@ const router = createBrowserRouter([
       { path: '/home', element: <HomePage /> },
       { path: '/ingredients', element: <IngredientListPage /> },
       { path: '/mypage', element: <MyPage /> },
-
-      { path: '/ingredients/new', element: <IngredientNewPage /> },
-      { path: '/ingredients/new/form', element: <IngredientFormPage /> },
-      { path: '/ingredients/:id', element: <IngredientDetailPage /> },
-      { path: '/ingredients/:id/edit', element: <IngredientEditPage /> },
-      { path: '/scan', element: <ScanPage /> },
-      { path: '/scan/result', element: <ScanResultPage /> },
+    ],
+  },
+  {
+    element: <SubLayout />,
+    children: [
+      {
+        path: '/ingredients/new',
+        element: <IngredientNewPage />,
+        handle: {
+          title: '식재료 등록',
+        },
+      },
+      {
+        path: '/ingredients/new/form',
+        element: <IngredientFormPage />,
+        handle: { title: '식재료 등록' },
+      },
+      {
+        path: '/ingredients/:id',
+        element: <IngredientDetailPage />,
+        handle: { title: '식재료 상세' },
+      },
+      {
+        path: '/ingredients/:id/edit',
+        element: <IngredientEditPage />,
+        handle: { title: '식재료 수정' },
+      },
+      { path: '/scan', element: <ScanPage />, handle: { title: '카메라로 등록' } },
+      { path: '/scan/result', element: <ScanResultPage />, handle: { title: '인식 결과 확인' } },
     ],
   },
 ])

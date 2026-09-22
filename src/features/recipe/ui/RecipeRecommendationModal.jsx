@@ -11,7 +11,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
   const [isIngredientLoading, setIsIngredientLoading] = useState(false) //ingredients 로딩상태관리
   const [ingredientError, setIngredientError] = useState(null) //ingredients 통신에러상태관리
 
-  const [isRecommendationLoading, setIsRecommendationLoading] = useState(false) //레시피 추천 로딩 상태
+  // const [isRecommendationLoading, setIsRecommendationLoading] = useState(false) //레시피 추천 로딩 상태
 
   const URGENT_DAYS_LIMIT = 5
 
@@ -123,6 +123,19 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
   }
 
+  //d-day 표기 함수
+  function formatDaysLeft(daysLeft) {
+    if (daysLeft === 0) {
+      return 'D-Day'
+    }
+
+    if (daysLeft < 0) {
+      return `D+${Math.abs(daysLeft)}`
+    }
+
+    return `D-${daysLeft}`
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -132,6 +145,12 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       variant="bottomSheet"
     >
       <RecipeIngredientFilter value={filter} onChange={setFilter} />
+
+      {ingredientError && (
+        <p role="alert" className="mt-3 text-sm text-red-500">
+          {ingredientError}
+        </p>
+      )}
 
       {/* 재료 선택 제목 및 전체 선택/초기화 */}
       <div className="mt-3 flex items-center justify-between">
@@ -185,8 +204,20 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
               }
             >
               <span aria-hidden="true">{category.icon}</span>
+
               <span>{ingredient.productName}</span>
-              <span>D-{ingredient.daysLeft}</span>
+
+              <span
+                className={
+                  isUrgentIngredient(ingredient)
+                    ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
+                    : isSelected
+                      ? 'text-xs text-green-100'
+                      : 'text-xs text-gray-500'
+                }
+              >
+                {formatDaysLeft(ingredient.daysLeft)}
+              </span>
             </button>
           )
         })}

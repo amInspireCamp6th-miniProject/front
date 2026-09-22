@@ -1,7 +1,6 @@
 import Button from '../../../components/ui/Button.jsx'
 
 const FILTER_OPTIONS = [
-  { value: 'all', label: '전체' },
   { value: 'urgent', label: '임박 재료' },
   { value: 'owned', label: '보유 재료' },
 ]

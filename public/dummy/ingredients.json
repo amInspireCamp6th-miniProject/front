@@ -1,0 +1,40 @@
+{
+  "ingredients": [
+    {
+      "ingredientId": 1,
+      "productName": "대파",
+      "categoryId": 1,
+      "daysLeft": 1
+    },
+    {
+      "ingredientId": 2,
+      "productName": "우유",
+      "categoryId": 2,
+      "daysLeft": 2
+    },
+    {
+      "ingredientId": 3,
+      "productName": "햄",
+      "categoryId": 3,
+      "daysLeft": 3
+    },
+    {
+      "ingredientId": 4,
+      "productName": "두부",
+      "categoryId": 4,
+      "daysLeft": 4
+    },
+    {
+      "ingredientId": 5,
+      "productName": "계란",
+      "categoryId": 5,
+      "daysLeft": 8
+    },
+    {
+      "ingredientId": 6,
+      "productName": "양파",
+      "categoryId": 1,
+      "daysLeft": 10
+    }
+  ]
+}

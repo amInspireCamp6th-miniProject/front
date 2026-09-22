@@ -1,14 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import RegisterChoosePage from './features/ingredient/page/RegisterChoosePage'
+import { RouterProvider } from 'react-router-dom'
+import router from './routes/router'
 
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/register" element={<RegisterChoosePage />} />
-        <Route path="/register/camera" element={<p>M05 카메라 화면 (준비 중)</p>} />
-        <Route path="*" element={<Navigate to="/register" />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="mx-auto flex h-full max-w-[430px] flex-col bg-white">
+      <RouterProvider router={router} />
+    </div>
   )
 }
+
+export default App

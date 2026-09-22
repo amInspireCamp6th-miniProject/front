@@ -5,6 +5,7 @@ function LandingPage() {
     <div className="flex h-full flex-col justify-end gap-3 p-5">
       <p className="mb-auto pt-20 text-center text-sm text-gray-400">랜딩 화면 자리</p>
 
+      {/* <Link> 는 내부적으로 <a>로 만듦 >> 그래서 <a>의 inline 때문에 block으로 바꾸고 버튼역할 하게끔*/}
       <Link
         to="/login"
         className="block rounded-lg bg-green-800 py-3 text-center text-sm text-white"

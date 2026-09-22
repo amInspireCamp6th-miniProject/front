@@ -12,22 +12,27 @@ import LandingPage from '../features/user/page/LandingPage'
 import LoginPage from '../features/user/page/LoginPage'
 import MyPage from '../features/user/page/MyPage'
 import SignupPage from '../features/user/page/SignupPage'
+import TabBarLayout from '../components/layout/TabBarLayout'
 
 const router = createBrowserRouter([
   { path: '/', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignupPage /> },
+  {
+    element: <TabBarLayout />,
+    children: [
+      { path: '/home', element: <HomePage /> },
+      { path: '/ingredients', element: <IngredientListPage /> },
+      { path: '/mypage', element: <MyPage /> },
 
-  { path: '/home', element: <HomePage /> },
-  { path: '/ingredients', element: <IngredientListPage /> },
-  { path: '/mypage', element: <MyPage /> },
-
-  { path: '/ingredients/new', element: <IngredientNewPage /> },
-  { path: '/ingredients/new/form', element: <IngredientFormPage /> },
-  { path: '/ingredients/:id', element: <IngredientDetailPage /> },
-  { path: '/ingredients/:id/edit', element: <IngredientEditPage /> },
-  { path: '/scan', element: <ScanPage /> },
-  { path: '/scan/result', element: <ScanResultPage /> },
+      { path: '/ingredients/new', element: <IngredientNewPage /> },
+      { path: '/ingredients/new/form', element: <IngredientFormPage /> },
+      { path: '/ingredients/:id', element: <IngredientDetailPage /> },
+      { path: '/ingredients/:id/edit', element: <IngredientEditPage /> },
+      { path: '/scan', element: <ScanPage /> },
+      { path: '/scan/result', element: <ScanResultPage /> },
+    ],
+  },
 ])
 
 export default router

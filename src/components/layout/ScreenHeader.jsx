@@ -5,7 +5,7 @@ function ScreenHeader({ title }) {
   const navigate = useNavigate()
 
   return (
-    <div className="h-[52px] flex items-center px-2 border-b border-line shrink-0">
+    <div className="h-[52px] flex items-center px-2 border-b border-gray-200 shrink-0">
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -13,7 +13,7 @@ function ScreenHeader({ title }) {
       >
         <Icon name="chevronLeft" />
       </button>
-      <p className="flex-1 text-center text-[17px] font-bold text-ink -ml-8">{title}</p>
+      <p className="flex-1 text-center text-[17px] font-bold text-gray-900 -ml-8">{title}</p>
     </div>
   )
 }

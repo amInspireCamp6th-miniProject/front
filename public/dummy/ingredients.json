@@ -14,7 +14,7 @@
   {
     "ingredientId": 3,
     "productName": "슬라이스 햄",
-    "categoryId": 6,
+    "categoryId": 3,
     "daysLeft": 3
   },
   {
@@ -32,7 +32,7 @@
   {
     "ingredientId": 6,
     "productName": "계란 10구",
-    "categoryId": 6,
+    "categoryId": 5,
     "daysLeft": 8
   },
   {

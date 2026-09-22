@@ -2,7 +2,10 @@ import { useEffect, useState, useCallback } from 'react'
 
 import Modal from '../../../components/ui/Modal.jsx'
 import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
-import getIngredients from '../../ingredient/api/ingredientApi.js'
+import getIngredients from '../../ingredient/api/IngredientApi.js'
+import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
+
+
 
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
@@ -166,21 +169,30 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       <div className="mt-3 flex flex-wrap gap-2">
         {visibleIngredients.map((ingredient) => {
           const isSelected = selectedIds.includes(ingredient.ingredientId)
+            
+          const category =
+            INGREDIENT_CATEGORY[ingredient.categoryId] ?? {
+              name: '기타',
+              icon: '🍽️',
+            }
 
           return (
-            <button
-              key={ingredient.ingredientId}
-              type="button"
-              onClick={() => handleIngredientToggle(ingredient.ingredientId)}
-              className={
-                isSelected
-                  ? 'rounded-full bg-green-700 px-3 py-2 text-white'
-                  : 'rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
-              }
-            >
-              {ingredient.productName} D-{ingredient.daysLeft}
-            </button>
-          )
+        <button
+          key={ingredient.ingredientId}
+          type="button"
+          onClick={() =>
+            handleIngredientToggle(ingredient.ingredientId)}
+          className={
+            isSelected
+              ? 'inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-2 text-white'
+              : 'inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
+          }
+        >
+          <span aria-hidden="true">{category.icon}</span>
+          <span>{ingredient.productName}</span>
+          <span>D-{ingredient.daysLeft}</span>
+        </button>
+      )
         })}
       </div>
     </Modal>

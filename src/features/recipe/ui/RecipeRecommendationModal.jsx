@@ -4,7 +4,6 @@ import Modal from '../../../components/ui/Modal.jsx'
 import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
 import getIngredients from '../../ingredient/api/ingredientApi.js'
 
-
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
   const [ingredients, setIngredients] = useState([]) //ingredients 데이터 관리
@@ -20,7 +19,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
   const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
 
-  
   // 모달 열렀을때 기본 필터링 설정
   const handleClose = useCallback(() => {
     setFilter('urgent')
@@ -29,20 +27,13 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
   //임박재료 구분 함수
   function isUrgentIngredient(ingredient) {
-    return (
-      ingredient.daysLeft >= 0 &&
-      ingredient.daysLeft <= URGENT_DAYS_LIMIT
-    )
+    return ingredient.daysLeft >= 0 && ingredient.daysLeft <= URGENT_DAYS_LIMIT
   }
-
 
   //선택된 재료의 ID를 가져오는 함수
   function getIngredientIds(ingredients) {
-    return ingredients.map(
-      (ingredient) => ingredient.ingredientId,
-    )
+    return ingredients.map((ingredient) => ingredient.ingredientId)
   }
-
 
   //식료품 데이터 상세 조회 통신
   useEffect(() => {
@@ -50,8 +41,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     if (!isOpen) return undefined
 
     async function loadIngredients() {
-      try{
-
+      try {
         setIsIngredientLoading(true)
         setIngredientError(null)
 
@@ -60,29 +50,21 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         setIngredients(data)
         console.log('식재료 조회 결과:', data)
 
-        const urgentIds =  getIngredientIds(data.filter(isUrgentIngredient))
-                    
+        const urgentIds = getIngredientIds(data.filter(isUrgentIngredient))
 
         setUrgentSelectedIds(urgentIds)
         setOwnedSelectedIds([])
-
-
-      } catch(err){
+      } catch (err) {
         console.error('식재료 조회 실패:', err)
 
-        setIngredientError(
-          err.response?.data?.message ??
-            '식재료 목록을 불러오지 못했습니다.',
-        ) 
+        setIngredientError(err.response?.data?.message ?? '식재료 목록을 불러오지 못했습니다.')
       } finally {
-          setIsIngredientLoading(false)
+        setIsIngredientLoading(false)
       }
     }
 
-    loadIngredients() 
+    loadIngredients()
   }, [isOpen])
-
-
 
   //ESC입력시 모달 닫기 함수
   useEffect(() => {
@@ -101,22 +83,13 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
   }, [isOpen, handleClose])
 
-  const visibleIngredients =
-    filter === 'urgent'
-      ? urgentIngredients
-      : ingredients
+  const visibleIngredients = filter === 'urgent' ? urgentIngredients : ingredients
 
-  const selectedIds =
-    filter === 'urgent'
-      ? urgentSelectedIds
-      : ownedSelectedIds
+  const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds
 
   // 마감임박 식재료 선택 상태로 전환
   function handleIngredientToggle(ingredientId) {
-    const setSelectedIds =
-      filter === 'urgent'
-        ? setUrgentSelectedIds
-        : setOwnedSelectedIds
+    const setSelectedIds = filter === 'urgent' ? setUrgentSelectedIds : setOwnedSelectedIds
 
     setSelectedIds((previousIds) => {
       const isSelected = previousIds.includes(ingredientId)
@@ -129,8 +102,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     })
   }
 
-
-  // 현재 화면에 보이는 재료를 전부 선택 함수 
+  // 현재 화면에 보이는 재료를 전부 선택 함수
   function handleSelectAll() {
     const visibleIds = getIngredientIds(visibleIngredients)
 
@@ -141,17 +113,14 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
   }
 
-
-    // 선택 상태 초기화 함수 
+  // 선택 상태 초기화 함수
   function handleResetSelection() {
     if (filter === 'urgent') {
       setUrgentSelectedIds([])
     } else {
       setOwnedSelectedIds([])
-    }   
+    }
   }
-  
-
 
   return (
     <Modal
@@ -159,19 +128,15 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       title="추천 레시피"
       titleId="recipe-modal-title"
       onClose={handleClose}
-      variant="bottomSheet">
-
-      <RecipeIngredientFilter 
-        value={filter} 
-        onChange={setFilter} />
+      variant="bottomSheet"
+    >
+      <RecipeIngredientFilter value={filter} onChange={setFilter} />
 
       {/* 재료 선택 제목 및 전체 선택/초기화 */}
       <div className="mt-3 flex items-center justify-between">
         <p className="text-sm font-semibold text-gray-900">
           오늘 쓸 재료를 골라주세요{' '}
-          <span className="text-green-700">
-            {selectedIds.length}개 선택
-          </span>
+          <span className="text-green-700">{selectedIds.length}개 선택</span>
         </p>
 
         <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -198,32 +163,26 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       </div>
 
       {/* 식재료 선택목록 */}
-    <div className="mt-3 flex flex-wrap gap-2">
-      {visibleIngredients.map((ingredient) => {
-        const isSelected = selectedIds.includes(
-          ingredient.ingredientId,
-        )
+      <div className="mt-3 flex flex-wrap gap-2">
+        {visibleIngredients.map((ingredient) => {
+          const isSelected = selectedIds.includes(ingredient.ingredientId)
 
-        return (
-          <button
-            key={ingredient.ingredientId}
-            type="button"
-            onClick={() =>
-              handleIngredientToggle(ingredient.ingredientId)
-            }
-            className={
-              isSelected
-                ? 'rounded-full bg-green-700 px-3 py-2 text-white'
-                : 'rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
-            }
-          >
-            {ingredient.productName} D-{ingredient.daysLeft}
-          </button>
-        )
-      })}
-    </div>
-
-
+          return (
+            <button
+              key={ingredient.ingredientId}
+              type="button"
+              onClick={() => handleIngredientToggle(ingredient.ingredientId)}
+              className={
+                isSelected
+                  ? 'rounded-full bg-green-700 px-3 py-2 text-white'
+                  : 'rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
+              }
+            >
+              {ingredient.productName} D-{ingredient.daysLeft}
+            </button>
+          )
+        })}
+      </div>
     </Modal>
   )
 }

@@ -1,4 +1,4 @@
-import Button from '../../../components/common/Button.jsx'
+import Button from '../../../components/ui/Button.jsx'
 
 const FILTER_OPTIONS = [
   { value: 'all', label: '전체' },

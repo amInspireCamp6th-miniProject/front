@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 
-import Modal from '../../../components/common/Modal.jsx'
+import Modal from '../../../components/ui/Modal.jsx'
 import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
 
 function RecipeRecommendationModal({ isOpen, onClose }) {

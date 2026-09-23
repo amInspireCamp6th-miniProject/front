@@ -7,6 +7,7 @@ import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
 import recommendRecipes from '../api/recipeApi.js'
 import Button from '../../../components/ui/Button.jsx'
 import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
+import RecipeRecommendationResult from './RecipeRecommendationResult.jsx'
 
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
@@ -22,16 +23,21 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
   const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
 
   const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
-
   const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
-
   const [recommendationError, setRecommendationError] = useState(null) //에러 관리
 
-  // 모달 열렀을때 기본 필터링 설정
+  const visibleIngredients = filter === 'urgent' ? urgentIngredients : ingredients //버튼 클릭 후 보이는 상태
+
+  const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds //post를 위한 id 필터링
+
+  // 모달을 닫을 때 필터와 추천 결과 초기화
   const handleClose = useCallback(() => {
     setFilter('urgent')
+    setRecommendationStatus('idle')
+    setRecommendedRecipes([])
+    setRecommendationError(null)
     onClose()
-  }, [onClose])
+  }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
 
   //임박재료 구분 함수
   function isUrgentIngredient(ingredient) {
@@ -75,6 +81,33 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     loadIngredients()
   }, [isOpen])
 
+  //선택 재료 id post 후 추천 레시피 통신
+  async function handleRecommendation() {
+    if (selectedIds.length === 0) return
+
+    try {
+      setRecommendationStatus('loading')
+      setRecommendationError(null)
+
+      console.log('추천 요청:', {
+        ingredientIds: selectedIds,
+      })
+
+      const data = await recommendRecipes(selectedIds)
+
+      setRecommendedRecipes(data)
+      setRecommendationStatus('success')
+
+      console.log('추천 응답:', data)
+    } catch (error) {
+      const errorResponse = error.response?.data
+
+      setRecommendationError(errorResponse?.message ?? '레시피 추천에 실패했습니다.')
+
+      setRecommendationStatus('error')
+    }
+  }
+
   //ESC입력시 모달 닫기 함수
   useEffect(() => {
     if (!isOpen) return
@@ -91,10 +124,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       document.removeEventListener('keydown', handleEscapeKey)
     }
   }, [isOpen, handleClose])
-
-  const visibleIngredients = filter === 'urgent' ? urgentIngredients : ingredients
-
-  const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds
 
   // 마감임박 식재료 선택 상태로 전환
   function handleIngredientToggle(ingredientId) {
@@ -142,33 +171,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
 
     return `D-${daysLeft}`
-  }
-
-  //
-  async function handleRecommendation() {
-    if (selectedIds.length === 0) return
-
-    try {
-      setRecommendationStatus('loading')
-      setRecommendationError(null)
-
-      console.log('추천 요청:', {
-        ingredientIds: selectedIds,
-      })
-
-      const data = await recommendRecipes(selectedIds)
-
-      setRecommendedRecipes(data)
-      setRecommendationStatus('success')
-
-      console.log('추천 응답:', data)
-    } catch (error) {
-      const errorResponse = error.response?.data
-
-      setRecommendationError(errorResponse?.message ?? '레시피 추천에 실패했습니다.')
-
-      setRecommendationStatus('error')
-    }
   }
 
   return (
@@ -261,14 +263,12 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
       {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
 
+      {/* 레시피 추천 버튼 클릭 후 통신 성공 */}
       {recommendationStatus === 'success' && (
-        <ul className="mt-6">
-          {recommendedRecipes.map((recipe, index) => (
-            <li key={`${recipe.name}-${index}`}>{recipe.name}</li>
-          ))}
-        </ul>
+        <RecipeRecommendationResult recipes={recommendedRecipes} />
       )}
 
+      {/* 레시피 추천 버튼 클릭 후 통신 실패 */}
       {recommendationStatus === 'error' && (
         <p role="alert" className="mt-6 text-center text-red-500">
           {recommendationError}

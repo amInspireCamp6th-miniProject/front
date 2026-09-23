@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import ScreenHeader from '../../../components/layout/ScreenHeader'
 import ChoiceCard from '../ui/ChoiceCard'
 
 function IngredientNewPage() {
@@ -7,7 +6,6 @@ function IngredientNewPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <ScreenHeader title="식재료 등록" />
       <div className="flex-1 px-5 pt-8 flex flex-col gap-4">
         <ChoiceCard
           icon="camera"

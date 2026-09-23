@@ -7,6 +7,8 @@ import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
 import recommendRecipes from '../api/recipeApi.js'
 import Button from '../../../components/ui/Button.jsx'
 import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
+import RecipeRecommendationResult from './RecipeRecommendationResult.jsx'
+
 
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
@@ -22,29 +24,35 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
   const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
 
   const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
-
   const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
-
   const [recommendationError, setRecommendationError] = useState(null) //에러 관리
+
+  const visibleIngredients = filter === 'urgent' ? urgentIngredients : ingredients //버튼 클릭 후 보이는 상태
+
+  const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds //post를 위한 id 필터링
+
 
   // 모달을 닫을 때 필터와 추천 결과 초기화
   const handleClose = useCallback(() => {
     setFilter('urgent')
     setRecommendationStatus('idle')
-    setRecommendedRecipes([])
+    setRecommendedRecipes([]) 
     setRecommendationError(null)
     onClose()
   }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
+
 
   //임박재료 구분 함수
   function isUrgentIngredient(ingredient) {
     return ingredient.daysLeft >= 0 && ingredient.daysLeft <= URGENT_DAYS_LIMIT
   }
 
+
   //선택된 재료의 ID를 가져오는 함수
   function getIngredientIds(ingredients) {
     return ingredients.map((ingredient) => ingredient.ingredientId)
   }
+
 
   //식료품 데이터 상세 조회 통신
   useEffect(() => {
@@ -78,76 +86,8 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     loadIngredients()
   }, [isOpen])
 
-  //ESC입력시 모달 닫기 함수
-  useEffect(() => {
-    if (!isOpen) return
 
-    const handleEscapeKey = (e) => {
-      if (e.key === 'Escape') {
-        handleClose()
-      }
-    }
-
-    document.addEventListener('keydown', handleEscapeKey)
-
-    return () => {
-      document.removeEventListener('keydown', handleEscapeKey)
-    }
-  }, [isOpen, handleClose])
-
-  const visibleIngredients = filter === 'urgent' ? urgentIngredients : ingredients
-
-  const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds
-
-  // 마감임박 식재료 선택 상태로 전환
-  function handleIngredientToggle(ingredientId) {
-    const setSelectedIds = filter === 'urgent' ? setUrgentSelectedIds : setOwnedSelectedIds
-
-    setSelectedIds((previousIds) => {
-      const isSelected = previousIds.includes(ingredientId)
-
-      if (isSelected) {
-        return previousIds.filter((id) => id !== ingredientId)
-      }
-
-      return [...previousIds, ingredientId]
-    })
-  }
-
-  // 현재 화면에 보이는 재료를 전부 선택 함수
-  function handleSelectAll() {
-    const visibleIds = getIngredientIds(visibleIngredients)
-
-    if (filter === 'urgent') {
-      setUrgentSelectedIds(visibleIds)
-    } else {
-      setOwnedSelectedIds(visibleIds)
-    }
-  }
-
-  // 선택 상태 초기화 함수
-  function handleResetSelection() {
-    if (filter === 'urgent') {
-      setUrgentSelectedIds([])
-    } else {
-      setOwnedSelectedIds([])
-    }
-  }
-
-  //d-day 표기 함수
-  function formatDaysLeft(daysLeft) {
-    if (daysLeft === 0) {
-      return 'D-Day'
-    }
-
-    if (daysLeft < 0) {
-      return `D+${Math.abs(daysLeft)}`
-    }
-
-    return `D-${daysLeft}`
-  }
-
-  //
+  //선택 재료 id post 후 추천 레시피 통신
   async function handleRecommendation() {
     if (selectedIds.length === 0) return
 
@@ -173,6 +113,78 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       setRecommendationStatus('error')
     }
   }
+
+
+  //ESC입력시 모달 닫기 함수
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape') {
+        handleClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeKey)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey)
+    }
+  }, [isOpen, handleClose])
+
+
+
+  // 마감임박 식재료 선택 상태로 전환
+  function handleIngredientToggle(ingredientId) {
+    const setSelectedIds = filter === 'urgent' ? setUrgentSelectedIds : setOwnedSelectedIds
+
+    setSelectedIds((previousIds) => {
+      const isSelected = previousIds.includes(ingredientId)
+
+      if (isSelected) {
+        return previousIds.filter((id) => id !== ingredientId)
+      }
+
+      return [...previousIds, ingredientId]
+    })
+  }
+
+
+  // 현재 화면에 보이는 재료를 전부 선택 함수
+  function handleSelectAll() {
+    const visibleIds = getIngredientIds(visibleIngredients)
+
+    if (filter === 'urgent') {
+      setUrgentSelectedIds(visibleIds)
+    } else {
+      setOwnedSelectedIds(visibleIds)
+    }
+  }
+
+
+  // 선택 상태 초기화 함수
+  function handleResetSelection() {
+    if (filter === 'urgent') {
+      setUrgentSelectedIds([])
+    } else {
+      setOwnedSelectedIds([])
+    }
+  }
+
+
+  //d-day 표기 함수
+  function formatDaysLeft(daysLeft) {
+    if (daysLeft === 0) {
+      return 'D-Day'
+    }
+
+    if (daysLeft < 0) {
+      return `D+${Math.abs(daysLeft)}`
+    }
+
+    return `D-${daysLeft}`
+  }
+
 
   return (
     <Modal
@@ -264,14 +276,11 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
       {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
 
-      {recommendationStatus === 'success' && (
-        <ul className="mt-6">
-          {recommendedRecipes.map((recipe, index) => (
-            <li key={`${recipe.name}-${index}`}>{recipe.name}</li>
-          ))}
-        </ul>
-      )}
+      {/* 레시피 추천 버튼 클릭 후 통신 성공 */}
+     {recommendationStatus === 'success' && (
+        <RecipeRecommendationResult recipes={recommendedRecipes}/>)}
 
+      {/* 레시피 추천 버튼 클릭 후 통신 실패 */}
       {recommendationStatus === 'error' && (
         <p role="alert" className="mt-6 text-center text-red-500">
           {recommendationError}

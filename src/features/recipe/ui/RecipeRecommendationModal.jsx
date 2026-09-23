@@ -2,8 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 
 import Modal from '../../../components/ui/Modal.jsx'
 import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
-import getIngredients from '../../ingredient/api/IngredientApi.js'
+import getIngredients from '../../ingredient/api/ingredientApi.js'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
+import recommendRecipes from '../api/recipeApi.js'
+import Button from '../../../components/ui/Button.jsx'
+import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
 
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
@@ -11,14 +14,18 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
   const [isIngredientLoading, setIsIngredientLoading] = useState(false) //ingredients 로딩상태관리
   const [ingredientError, setIngredientError] = useState(null) //ingredients 통신에러상태관리
 
-  // const [isRecommendationLoading, setIsRecommendationLoading] = useState(false) //레시피 추천 로딩 상태
-
   const URGENT_DAYS_LIMIT = 5
 
   const [urgentSelectedIds, setUrgentSelectedIds] = useState([]) //uregent ingredient id
   const [ownedSelectedIds, setOwnedSelectedIds] = useState([]) //사용자 선택 ingredient id
 
   const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
+
+  const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
+
+  const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
+
+  const [recommendationError, setRecommendationError] = useState(null) //에러 관리
 
   // 모달 열렀을때 기본 필터링 설정
   const handleClose = useCallback(() => {
@@ -56,9 +63,10 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         setUrgentSelectedIds(urgentIds)
         setOwnedSelectedIds([])
       } catch (err) {
-        console.error('식재료 조회 실패:', err)
-
-        setIngredientError(err.response?.data?.message ?? '식재료 목록을 불러오지 못했습니다.')
+        const errorResponse = err.response?.data
+        console.error('오류 코드:', errorResponse?.code)
+        console.error('오류 내용:', errorResponse?.message)
+        console.error('필드 오류:', errorResponse?.errors)
       } finally {
         setIsIngredientLoading(false)
       }
@@ -134,6 +142,33 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
 
     return `D-${daysLeft}`
+  }
+
+  //
+  async function handleRecommendation() {
+    if (selectedIds.length === 0) return
+
+    try {
+      setRecommendationStatus('loading')
+      setRecommendationError(null)
+
+      console.log('추천 요청:', {
+        ingredientIds: selectedIds,
+      })
+
+      const data = await recommendRecipes(selectedIds)
+
+      setRecommendedRecipes(data)
+      setRecommendationStatus('success')
+
+      console.log('추천 응답:', data)
+    } catch (error) {
+      const errorResponse = error.response?.data
+
+      setRecommendationError(errorResponse?.message ?? '레시피 추천에 실패했습니다.')
+
+      setRecommendationStatus('error')
+    }
   }
 
   return (
@@ -222,6 +257,35 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
           )
         })}
       </div>
+
+      {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
+      {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
+
+      {recommendationStatus === 'success' && (
+        <ul className="mt-6">
+          {recommendedRecipes.map((recipe, index) => (
+            <li key={`${recipe.name}-${index}`}>{recipe.name}</li>
+          ))}
+        </ul>
+      )}
+
+      {recommendationStatus === 'error' && (
+        <p role="alert" className="mt-6 text-center text-red-500">
+          {recommendationError}
+        </p>
+      )}
+
+      {/* 레시피 추천 버튼*/}
+      <Button
+        type="button"
+        onClick={handleRecommendation}
+        disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
+        className="mt-6 w-full rounded-lg bg-green-700 px-4 py-3 font-semibold text-white"
+      >
+        {recommendationStatus === 'loading'
+          ? '추천 중...'
+          : `선택한 재료 ${selectedIds.length}개로 추천받기`}
+      </Button>
     </Modal>
   )
 }

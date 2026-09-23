@@ -8,7 +8,8 @@ function RecipeRecommendationLoading() {
         items-center 
         justify-center"
       role="status"
-      aria-live="polite">
+      aria-live="polite"
+    >
       <div
         className="
           h-9 
@@ -22,9 +23,7 @@ function RecipeRecommendationLoading() {
       />
 
       <p className="mt-4 font-semibold text-gray-900">레시피를 찾고 있어요...</p>
-      <p className="mt-2 text-sm text-gray-400">
-        선택한 재료로 만들 수 있는 조합을 계산 중이에요
-      </p>
+      <p className="mt-2 text-sm text-gray-400">선택한 재료로 만들 수 있는 조합을 계산 중이에요</p>
     </div>
   )
 }

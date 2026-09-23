@@ -3,14 +3,12 @@
 
 // async function recommendRecipes(ingredientIds) {
 //     const response = await api.post('/api/v1/recipes/recommendations',{ingredientIds})
-    
+
 //     return response.data
-    
+
 // }
 
 // export default recommendRecipes
-
-
 
 import api from '../../../api/axios.js'
 

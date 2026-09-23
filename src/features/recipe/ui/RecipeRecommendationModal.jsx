@@ -21,14 +21,11 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
   const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
 
-
   const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
 
   const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
 
   const [recommendationError, setRecommendationError] = useState(null) //에러 관리
-
-
 
   // 모달 열렀을때 기본 필터링 설정
   const handleClose = useCallback(() => {
@@ -65,14 +62,11 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
         setUrgentSelectedIds(urgentIds)
         setOwnedSelectedIds([])
-
       } catch (err) {
-
         const errorResponse = err.response?.data
         console.error('오류 코드:', errorResponse?.code)
         console.error('오류 내용:', errorResponse?.message)
         console.error('필드 오류:', errorResponse?.errors)
-
       } finally {
         setIsIngredientLoading(false)
       }
@@ -171,10 +165,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     } catch (error) {
       const errorResponse = error.response?.data
 
-      setRecommendationError(
-        errorResponse?.message ??
-          '레시피 추천에 실패했습니다.',
-      )
+      setRecommendationError(errorResponse?.message ?? '레시피 추천에 실패했습니다.')
 
       setRecommendationStatus('error')
     }
@@ -273,18 +264,13 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       {recommendationStatus === 'success' && (
         <ul className="mt-6">
           {recommendedRecipes.map((recipe, index) => (
-            <li key={`${recipe.name}-${index}`}>
-              {recipe.name}
-            </li>
+            <li key={`${recipe.name}-${index}`}>{recipe.name}</li>
           ))}
         </ul>
       )}
 
       {recommendationStatus === 'error' && (
-        <p
-          role="alert"
-          className="mt-6 text-center text-red-500"
-        >
+        <p role="alert" className="mt-6 text-center text-red-500">
           {recommendationError}
         </p>
       )}
@@ -293,10 +279,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       <Button
         type="button"
         onClick={handleRecommendation}
-        disabled={
-          selectedIds.length === 0 ||
-          recommendationStatus === 'loading'
-        }
+        disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
         className="mt-6 w-full rounded-lg bg-green-700 px-4 py-3 font-semibold text-white"
       >
         {recommendationStatus === 'loading'

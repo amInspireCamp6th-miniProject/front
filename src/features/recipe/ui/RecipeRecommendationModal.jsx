@@ -27,11 +27,14 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
   const [recommendationError, setRecommendationError] = useState(null) //에러 관리
 
-  // 모달 열렀을때 기본 필터링 설정
+  // 모달을 닫을 때 필터와 추천 결과 초기화
   const handleClose = useCallback(() => {
     setFilter('urgent')
+    setRecommendationStatus('idle')
+    setRecommendedRecipes([])
+    setRecommendationError(null)
     onClose()
-  }, [onClose])
+  }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
 
   //임박재료 구분 함수
   function isUrgentIngredient(ingredient) {

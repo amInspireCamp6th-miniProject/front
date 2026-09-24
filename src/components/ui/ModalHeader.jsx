@@ -1,4 +1,4 @@
-import Button from './Button.jsx'
+import IconButton from './IconButton.jsx'
 
 function ModalHeader({ title, titleId, onClose }) {
   return (
@@ -12,18 +12,7 @@ function ModalHeader({ title, titleId, onClose }) {
         {title}
       </h2>
 
-      <Button
-        className="
-          h-8 
-          w-8 
-          rounded-full 
-          text-gray-500 
-          hover:bg-gray-100"
-        onClick={onClose}
-        aria-label="닫기"
-      >
-        ✕
-      </Button>
+      <IconButton icon="x" aria-label="닫기" onClick={onClose} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import bell from '../../assets/icons/bell.svg'
+import IconButton from '../ui/IconButton'
 function AppBar() {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-gray-100 px-4">
@@ -15,7 +15,7 @@ function AppBar() {
         // transition-colors 는 색변화를 부드럽게 해줌
         className="flex justify-center items-center size-7 rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
       >
-        <img src={bell} alt="" width="20" height="20" />
+        <IconButton icon="bell" aria-label="알림" variant="soft" />
       </button>
     </header>
   )

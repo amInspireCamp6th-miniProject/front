@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import chevronLeft from '../../assets/icons/chevron-left.svg'
+import IconButton from '../ui/IconButton'
 
 function PageHeader({ title }) {
   const navigate = useNavigate()
@@ -11,7 +11,7 @@ function PageHeader({ title }) {
         aria-label="뒤로 가기"
         className="flex size-5 items-center justify-center rounded-full hover:bg-gray-100"
       >
-        <img src={chevronLeft} alt="뒤로가기" width="20" height="20" />
+        <IconButton icon="chevronLeft" aria-label="뒤로가기" onClick={() => navigate(-1)} />
       </button>
       <h1 className="flex-1 text-center text-lg font-bold">{title}</h1>
       {/* title 중앙정렬용 */}

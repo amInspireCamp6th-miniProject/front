@@ -1,10 +1,19 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
+  const [photos, setPhotos] = useState([])
+
+  function handleFiles(e) {
+    const files = Array.from(e.target.files)
+    if (files.length === 0) return
+    setPhotos(files)
+    e.target.value = ''
+  }
+
   return (
     <div className="px-5 pt-6">
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6">
@@ -26,8 +35,16 @@ function ScanPage() {
         accept="image/*"
         capture="environment"
         className="hidden"
+        onChange={handleFiles}
       />
-      <input ref={albumInputRef} type="file" accept="image/*" multiple className="hidden" />
+      <input
+        ref={albumInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleFiles}
+      />
 
       <div className="mb-1 mt-4 flex gap-2">
         <Button
@@ -49,6 +66,7 @@ function ScanPage() {
       <p className="mb-4 text-center text-[12px] text-gray-400">
         촬영한 사진은 AI 식재료 인식에 사용되며 저장되지 않아요
       </p>
+      <p>고른 사진: {photos.length}장</p>
     </div>
   )
 }

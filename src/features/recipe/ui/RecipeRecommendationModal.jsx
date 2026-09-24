@@ -278,7 +278,15 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         type="button"
         onClick={handleRecommendation}
         disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
-        className="mt-6 w-full rounded-lg bg-green-700 px-4 py-3 font-semibold text-white"
+        className="
+          mt-6 
+          w-full 
+          rounded-lg 
+          bg-green-700 
+          px-4 
+          py-3 
+          font-semibold 
+          text-white"
       >
         {recommendationStatus === 'loading'
           ? '추천 중...'

@@ -180,6 +180,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       titleId="recipe-modal-title"
       onClose={handleClose}
       variant="bottomSheet"
+      scrollMode="custom"
     >
       <RecipeIngredientFilter value={filter} onChange={setFilter} />
 
@@ -197,12 +198,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         </p>
 
         <div className="flex items-center gap-2 text-xs text-gray-500">
-          <button
-            type="button"
-            onClick={handleSelectAll}
-            disabled={isIngredientLoading}
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button type="button" onClick={handleSelectAll}>
             전체 선택
           </button>
 
@@ -220,44 +216,46 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       </div>
 
       {/* 식재료 선택목록 */}
-      <div className="mt-3 flex flex-wrap gap-2">
-        {visibleIngredients.map((ingredient) => {
-          const isSelected = selectedIds.includes(ingredient.ingredientId)
+      <div className="mt-3 min-h-0 flex-auto overflow-y-auto overscroll-contain pr-1">
+        <div className="flex flex-wrap content-start gap-2">
+          {visibleIngredients.map((ingredient) => {
+            const isSelected = selectedIds.includes(ingredient.ingredientId)
 
-          const category = INGREDIENT_CATEGORY[ingredient.categoryId] ?? {
-            name: '기타',
-            icon: '🍽️',
-          }
+            const category = INGREDIENT_CATEGORY[ingredient.categoryId] ?? {
+              name: '기타',
+              icon: '🍽️',
+            }
 
-          return (
-            <button
-              key={ingredient.ingredientId}
-              type="button"
-              onClick={() => handleIngredientToggle(ingredient.ingredientId)}
-              className={
-                isSelected
-                  ? 'inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-2 text-white'
-                  : 'inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
-              }
-            >
-              <span aria-hidden="true">{category.icon}</span>
-
-              <span>{ingredient.productName}</span>
-
-              <span
+            return (
+              <button
+                key={ingredient.ingredientId}
+                type="button"
+                onClick={() => handleIngredientToggle(ingredient.ingredientId)}
                 className={
-                  isUrgentIngredient(ingredient)
-                    ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
-                    : isSelected
-                      ? 'text-xs text-green-100'
-                      : 'text-xs text-gray-500'
+                  isSelected
+                    ? 'inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-2 text-white'
+                    : 'inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
                 }
               >
-                {formatDaysLeft(ingredient.daysLeft)}
-              </span>
-            </button>
-          )
-        })}
+                <span aria-hidden="true">{category.icon}</span>
+
+                <span>{ingredient.productName}</span>
+
+                <span
+                  className={
+                    isUrgentIngredient(ingredient)
+                      ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
+                      : isSelected
+                        ? 'text-xs text-green-100'
+                        : 'text-xs text-gray-500'
+                  }
+                >
+                  {formatDaysLeft(ingredient.daysLeft)}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}

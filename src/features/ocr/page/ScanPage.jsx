@@ -1,7 +1,9 @@
+import { useRef } from 'react'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
 
 function ScanPage() {
+  const cameraInputRef = useRef(null)
   return (
     <div className="px-5 pt-6">
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6">
@@ -17,8 +19,19 @@ function ScanPage() {
         </p>
       </div>
 
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+      />
+
       <div className="mb-1 mt-4 flex gap-2">
-        <Button className="h-12 flex-1 gap-2 rounded-md bg-green-800 text-[15px] font-bold text-white">
+        <Button
+          onClick={() => cameraInputRef.current.click()}
+          className="h-12 flex-1 gap-2 rounded-md bg-green-800 text-[15px] font-bold text-white"
+        >
           <Icon name="camera" className="h-5 w-5" />
           촬영하기
         </Button>

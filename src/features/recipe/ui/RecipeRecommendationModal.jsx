@@ -4,6 +4,7 @@ import Modal from '../../../components/ui/Modal.jsx'
 import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
 import getIngredients from '../../ingredient/api/ingredientApi.js'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
+import { formatDaysLeft, isUrgent } from '../../ingredient/model/daysLeft.js'
 import recommendRecipes from '../api/recipeApi.js'
 import Button from '../../../components/ui/Button.jsx'
 import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
@@ -15,12 +16,10 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
   const [isIngredientLoading, setIsIngredientLoading] = useState(false) //ingredients 로딩상태관리
   const [ingredientError, setIngredientError] = useState(null) //ingredients 통신에러상태관리
 
-  const URGENT_DAYS_LIMIT = 5
-
   const [urgentSelectedIds, setUrgentSelectedIds] = useState([]) //uregent ingredient id
   const [ownedSelectedIds, setOwnedSelectedIds] = useState([]) //사용자 선택 ingredient id
 
-  const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
+  const urgentIngredients = ingredients.filter((ingredient) => isUrgent(ingredient.daysLeft)) //uregent ingredien 값
 
   const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
   const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
@@ -38,11 +37,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     setRecommendationError(null)
     onClose()
   }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
-
-  //임박재료 구분 함수
-  function isUrgentIngredient(ingredient) {
-    return ingredient.daysLeft >= 0 && ingredient.daysLeft <= URGENT_DAYS_LIMIT
-  }
 
   //선택된 재료의 ID를 가져오는 함수
   function getIngredientIds(ingredients) {
@@ -64,7 +58,9 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         setIngredients(data)
         console.log('식재료 조회 결과:', data)
 
-        const urgentIds = getIngredientIds(data.filter(isUrgentIngredient))
+        const urgentIds = getIngredientIds(
+          data.filter((ingredient) => isUrgent(ingredient.daysLeft)),
+        )
 
         setUrgentSelectedIds(urgentIds)
         setOwnedSelectedIds([])
@@ -160,19 +156,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
   }
 
-  //d-day 표기 함수
-  function formatDaysLeft(daysLeft) {
-    if (daysLeft === 0) {
-      return 'D-Day'
-    }
-
-    if (daysLeft < 0) {
-      return `D+${Math.abs(daysLeft)}`
-    }
-
-    return `D-${daysLeft}`
-  }
-
   return (
     <Modal
       isOpen={isOpen}
@@ -243,7 +226,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
                 <span
                   className={
-                    isUrgentIngredient(ingredient)
+                    isUrgent(ingredient.daysLeft)
                       ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
                       : isSelected
                         ? 'text-xs text-green-100'

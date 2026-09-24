@@ -4,6 +4,7 @@ import Icon from '../../../components/ui/Icon'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
+  const albumInputRef = useRef(null)
   return (
     <div className="px-5 pt-6">
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6">
@@ -26,6 +27,7 @@ function ScanPage() {
         capture="environment"
         className="hidden"
       />
+      <input ref={albumInputRef} type="file" accept="image/*" multiple className="hidden" />
 
       <div className="mb-1 mt-4 flex gap-2">
         <Button
@@ -35,7 +37,10 @@ function ScanPage() {
           <Icon name="camera" className="h-5 w-5" />
           촬영하기
         </Button>
-        <Button className="h-12 flex-1 gap-2 rounded-md border border-gray-200 bg-white text-[14px] font-bold text-gray-900">
+        <Button
+          onClick={() => albumInputRef.current.click()}
+          className="h-12 flex-1 gap-2 rounded-md border border-gray-200 bg-white text-[14px] font-bold text-gray-900"
+        >
           <Icon name="inventory" className="h-5 w-5" />
           앨범에서 여러 장 선택
         </Button>

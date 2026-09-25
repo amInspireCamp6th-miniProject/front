@@ -1,6 +1,6 @@
 import Spinner from '../../../components/ui/Spinner.jsx'
 
-function ScanLoading() {
+function ScanLoading({ photos = [] }) {
   return (
     <div
       className="
@@ -22,6 +22,7 @@ function ScanLoading() {
       <p className="text-center text-xs text-gray-400">
         사진 속 재료를 인식해서 목록으로 정리할게요
       </p>
+      <p>받은 사진: {photos.length}장</p>
     </div>
   )
 }

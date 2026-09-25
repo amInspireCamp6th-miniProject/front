@@ -17,7 +17,7 @@ function ScanPage() {
     e.target.value = ''
   }
 
-  if (isAnalyzing) return <ScanLoading />
+  if (isAnalyzing) return <ScanLoading photos={photos} />
 
   return (
     <div className="px-5 pt-6">

@@ -1,20 +1,36 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
 import ScanLoading from '../ui/ScanLoading'
+import recognizeIngredients from '../api/ocrApi'
+import useScanStore from '../../../stores/useScanStore'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
   const [photos, setPhotos] = useState([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const navigate = useNavigate()
+  const setScanResults = useScanStore((state) => state.setScanResults)
 
-  function handleFiles(e) {
+  async function handleFiles(e) {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
     setIsAnalyzing(true)
     setPhotos(files)
     e.target.value = ''
+
+    const data = await recognizeIngredients()
+
+    const results = data.map((item, index) => ({
+      photo: files[index],
+      productName: item.productName,
+      ingredientName: item.ingredientName,
+      category: item.category,
+    }))
+    setScanResults(results)
+    navigate('/scan/result')
   }
 
   if (isAnalyzing) return <ScanLoading photos={photos} />

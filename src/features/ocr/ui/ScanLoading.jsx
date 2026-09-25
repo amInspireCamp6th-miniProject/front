@@ -14,6 +14,17 @@ function ScanLoading({ photos = [] }) {
       role="status"
       aria-live="polite"
     >
+      <div className="flex max-w-[280px] flex-wrap justify-center gap-2">
+        {photos.map((photo, index) => (
+          <img
+            key={index}
+            src={URL.createObjectURL(photo)}
+            alt={`고른 사진 ${index + 1}`}
+            className="h-16 w-16 rounded-lg object-cover"
+          />
+        ))}
+      </div>
+
       {/* spinner 컴포넌트 사용 */}
       <Spinner />
 
@@ -22,7 +33,6 @@ function ScanLoading({ photos = [] }) {
       <p className="text-center text-xs text-gray-400">
         사진 속 재료를 인식해서 목록으로 정리할게요
       </p>
-      <p>받은 사진: {photos.length}장</p>
     </div>
   )
 }

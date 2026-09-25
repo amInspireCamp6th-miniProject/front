@@ -1,18 +1,23 @@
 import { useRef, useState } from 'react'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
+import ScanLoading from '../ui/ScanLoading'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
   const [photos, setPhotos] = useState([])
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   function handleFiles(e) {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
+    setIsAnalyzing(true)
     setPhotos(files)
     e.target.value = ''
   }
+
+  if (isAnalyzing) return <ScanLoading />
 
   return (
     <div className="px-5 pt-6">
@@ -66,7 +71,6 @@ function ScanPage() {
       <p className="mb-4 text-center text-[12px] text-gray-400">
         촬영한 사진은 AI 식재료 인식에 사용되며 저장되지 않아요
       </p>
-      <p>고른 사진: {photos.length}장</p>
     </div>
   )
 }

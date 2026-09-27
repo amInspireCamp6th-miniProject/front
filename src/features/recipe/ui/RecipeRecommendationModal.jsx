@@ -37,6 +37,8 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
 
   const selectedIds = filter === 'urgent' ? urgentSelectedIds : ownedSelectedIds //post를 위한 id 필터링
 
+  const hasRecommendationResult = recommendationStatus !== 'idle'
+
   // 모달을 닫을 때 필터와 추천 결과 초기화
   const handleClose = useCallback(() => {
     setFilter('urgent')
@@ -145,15 +147,17 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       variant="bottomSheet"
       scrollMode="custom"
     >
-      <ChipGroup
-        options={FILTER_OPTIONS}
-        value={filter}
-        onChange={setFilter}
-        aria-label="식재료 필터"
-      />
+      <div className="shrink-0">
+        <ChipGroup
+          options={FILTER_OPTIONS}
+          value={filter}
+          onChange={setFilter}
+          aria-label="식재료 필터"
+        />
+      </div>
 
       {/* 재료 선택 제목 및 전체 선택/초기화 */}
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex shrink-0 items-center justify-between">
         <p className="text-sm font-semibold text-gray-900">
           오늘 쓸 재료를 골라주세요{' '}
           <span className="text-green-700">{selectedIds.length}개 선택</span>
@@ -173,7 +177,12 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       </div>
 
       {/* 식재료 선택목록 */}
-      <div className="mt-3 min-h-0 flex-auto overflow-y-auto overscroll-contain pr-1">
+      <div
+        className={`
+        mt-3 min-h-0 overflow-y-auto overscroll-contain pr-1
+        ${hasRecommendationResult ? 'max-h-28 shrink-0' : 'flex-auto'}
+      `}
+      >
         <div className="flex flex-wrap content-start gap-2">
           {visibleIngredients.map((ingredient) => {
             const isSelected = selectedIds.includes(ingredient.ingredientId)
@@ -210,26 +219,30 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
         </div>
       </div>
 
-      {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
-      {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
+      {hasRecommendationResult && (
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+          {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
+          {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
 
-      {/* 레시피 추천 버튼 클릭 후 통신 성공 */}
-      {recommendationStatus === 'success' && (
-        <RecipeRecommendationResult recipes={recommendedRecipes} />
-      )}
+          {/* 레시피 추천 버튼 클릭 후 통신 성공 */}
+          {recommendationStatus === 'success' && (
+            <RecipeRecommendationResult recipes={recommendedRecipes} />
+          )}
 
-      {/* 레시피 추천 버튼 클릭 후 통신 실패 */}
-      {recommendationStatus === 'error' && (
-        <p role="alert" className="mt-6 text-center text-red-500">
-          {recommendationError}
-        </p>
+          {/* 레시피 추천 버튼 클릭 후 통신 실패 */}
+          {recommendationStatus === 'error' && (
+            <p role="alert" className="mt-6 text-center text-red-500">
+              {recommendationError}
+            </p>
+          )}
+        </div>
       )}
 
       {/* 레시피 추천 버튼*/}
       <Button
         onClick={handleRecommendation}
         disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
-        className="mt-6 w-full"
+        className="mt-6 w-full shrink-0"
       >
         {recommendationStatus === 'loading'
           ? '추천 중...'

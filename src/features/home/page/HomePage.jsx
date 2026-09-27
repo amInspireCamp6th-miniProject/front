@@ -57,7 +57,11 @@ function HomePage() {
 
       <Button onClick={() => setIsModalOpen(true)}>레시피 추천 받기</Button>
 
-      <RecipeRecommendationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <RecipeRecommendationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ingredients={ingredients}
+      />
     </div>
   )
 }

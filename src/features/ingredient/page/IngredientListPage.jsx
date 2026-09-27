@@ -69,7 +69,11 @@ function IngredientListPage() {
         ))}
       </ul>
 
-      <RecipeRecommendationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <RecipeRecommendationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ingredients={ingredients}
+      />
     </div>
   )
 }

@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from 'react'
 import Chip from '../../../components/ui/Chip.jsx'
 import ChipGroup from '../../../components/ui/ChipGroup.jsx'
 import Modal from '../../../components/ui/Modal.jsx'
-import getIngredients from '../../ingredient/api/ingredientApi.js'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
 import { formatDaysLeft, isUrgent } from '../../ingredient/model/daysLeft.js'
 import recommendRecipes from '../api/recipeApi.js'
@@ -16,11 +15,14 @@ const FILTER_OPTIONS = [
   { value: 'owned', label: '보유 재료' },
 ]
 
-function RecipeRecommendationModal({ isOpen, onClose }) {
+//선택된 재료의 ID를 가져오는 함수 (컴포넌트 밖: 상태를 안 쓰는 순수 함수라 effect 의존성에 안 들어가도 된다)
+function getIngredientIds(ingredients) {
+  return ingredients.map((ingredient) => ingredient.ingredientId)
+}
+
+// ingredients 는 페이지(HomePage, IngredientListPage)가 이미 불러온 목록을 그대로 넘겨준다
+function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
-  const [ingredients, setIngredients] = useState([]) //ingredients 데이터 관리
-  const [isIngredientLoading, setIsIngredientLoading] = useState(false) //ingredients 로딩상태관리
-  const [ingredientError, setIngredientError] = useState(null) //ingredients 통신에러상태관리
 
   const [urgentSelectedIds, setUrgentSelectedIds] = useState([]) //uregent ingredient id
   const [ownedSelectedIds, setOwnedSelectedIds] = useState([]) //사용자 선택 ingredient id
@@ -44,44 +46,15 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     onClose()
   }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
 
-  //선택된 재료의 ID를 가져오는 함수
-  function getIngredientIds(ingredients) {
-    return ingredients.map((ingredient) => ingredient.ingredientId)
-  }
-
-  //식료품 데이터 상세 조회 통신
+  //모달이 열릴 때마다 임박 재료는 전부 선택된 상태로, 보유 재료 선택은 빈 상태로 시작
   useEffect(() => {
-    //modal을 컴포넌트로 쓰면 항상 open 상태라서 렌더링 상태 중단
-    if (!isOpen) return undefined
+    if (!isOpen) return
 
-    async function loadIngredients() {
-      try {
-        setIsIngredientLoading(true)
-        setIngredientError(null)
-
-        const data = await getIngredients()
-
-        setIngredients(data)
-        console.log('식재료 조회 결과:', data)
-
-        const urgentIds = getIngredientIds(
-          data.filter((ingredient) => isUrgent(ingredient.daysLeft)),
-        )
-
-        setUrgentSelectedIds(urgentIds)
-        setOwnedSelectedIds([])
-      } catch (err) {
-        const errorResponse = err.response?.data
-        console.error('오류 코드:', errorResponse?.code)
-        console.error('오류 내용:', errorResponse?.message)
-        console.error('필드 오류:', errorResponse?.errors)
-      } finally {
-        setIsIngredientLoading(false)
-      }
-    }
-
-    loadIngredients()
-  }, [isOpen])
+    setUrgentSelectedIds(
+      getIngredientIds(ingredients.filter((ingredient) => isUrgent(ingredient.daysLeft))),
+    )
+    setOwnedSelectedIds([])
+  }, [isOpen, ingredients])
 
   //선택 재료 id post 후 추천 레시피 통신
   async function handleRecommendation() {
@@ -178,12 +151,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
         aria-label="식재료 필터"
       />
 
-      {ingredientError && (
-        <p role="alert" className="mt-3 text-sm text-red-500">
-          {ingredientError}
-        </p>
-      )}
-
       {/* 재료 선택 제목 및 전체 선택/초기화 */}
       <div className="mt-3 flex items-center justify-between">
         <p className="text-sm font-semibold text-gray-900">
@@ -198,12 +165,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
           <span>|</span>
 
-          <button
-            type="button"
-            onClick={handleResetSelection}
-            disabled={isIngredientLoading}
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button type="button" onClick={handleResetSelection}>
             초기화
           </button>
         </div>

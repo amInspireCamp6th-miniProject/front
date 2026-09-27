@@ -1,0 +1,94 @@
+[
+  {
+    "ingredientId": 1,
+    "productName": "대파",
+    "categoryId": 1,
+    "quantity": 1,
+    "unit": "단",
+    "purchaseDate": "2026-09-20",
+    "expiryDate": "2026-09-28",
+    "daysLeft": 1,
+    "storage": "FRIDGE",
+    "imageUrl": "https://picsum.photos/seed/leek/200"
+  },
+  {
+    "ingredientId": 2,
+    "productName": "서울우유 1L",
+    "categoryId": 5,
+    "quantity": 1,
+    "unit": "개",
+    "purchaseDate": "2026-09-22",
+    "expiryDate": "2026-09-29",
+    "daysLeft": 2,
+    "storage": "FRIDGE",
+    "imageUrl": "https://picsum.photos/seed/milk/200"
+  },
+  {
+    "ingredientId": 3,
+    "productName": "슬라이스 햄",
+    "categoryId": 3,
+    "quantity": 1,
+    "unit": "팩",
+    "purchaseDate": "2026-09-16",
+    "expiryDate": "2026-09-30",
+    "daysLeft": 3,
+    "storage": "FRIDGE"
+  },
+  {
+    "ingredientId": 4,
+    "productName": "풀무원 국산콩 두부 300g",
+    "categoryId": 6,
+    "quantity": 2,
+    "unit": "개",
+    "purchaseDate": "2026-09-24",
+    "expiryDate": "2026-10-01",
+    "daysLeft": 4,
+    "storage": "FRIDGE"
+  },
+  {
+    "ingredientId": 5,
+    "productName": "고등어",
+    "categoryId": 4,
+    "quantity": 2,
+    "unit": "마리",
+    "purchaseDate": "2026-09-10",
+    "expiryDate": "2026-10-02",
+    "daysLeft": 5,
+    "storage": "FREEZER",
+    "imageUrl": "https://picsum.photos/seed/fish/200"
+  },
+  {
+    "ingredientId": 6,
+    "productName": "계란 10구",
+    "categoryId": 5,
+    "quantity": 10,
+    "unit": "개",
+    "purchaseDate": "2026-09-17",
+    "expiryDate": "2026-10-05",
+    "daysLeft": 8,
+    "storage": "FRIDGE"
+  },
+  {
+    "ingredientId": 7,
+    "productName": "사과",
+    "categoryId": 2,
+    "quantity": 3,
+    "unit": "개",
+    "purchaseDate": "2026-09-25",
+    "expiryDate": "2026-10-07",
+    "daysLeft": 10,
+    "storage": "ROOM",
+    "imageUrl": "https://picsum.photos/seed/apple/200"
+  },
+  {
+    "ingredientId": 8,
+    "productName": "삼겹살",
+    "categoryId": 3,
+    "quantity": 500,
+    "unit": "g",
+    "purchaseDate": "2026-09-15",
+    "expiryDate": "2026-10-17",
+    "daysLeft": 20,
+    "storage": "FREEZER"
+  }
+]

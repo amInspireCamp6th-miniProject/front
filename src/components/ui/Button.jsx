@@ -6,13 +6,15 @@
 // outline M05 앨범에서 여러 장 선택 M07 다시 촬영하기 M16 다시 확인할게요
 // ghost M01 둘러보기
 // danger M09 삭제
+// soft M03 레시피 추천
 const VARIANT_CLASS = {
-  primary: 'bg-green-700 text-white hover:bg-green-800',
-  secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-  dark: 'bg-gray-800 text-white hover:bg-gray-700 ',
-  outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
-  ghost: 'text-gray-400 underline hover:text-gray-600',
-  danger: 'bg-red-50 text-red-500 hover:bg-red-100',
+  primary: 'rounded-xl bg-green-700 text-white hover:bg-green-800',
+  secondary: 'rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200',
+  dark: 'rounded-xl bg-gray-800 text-white hover:bg-gray-700',
+  outline: 'rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+  ghost: 'rounded-xl text-gray-400 underline hover:text-gray-600',
+  danger: 'rounded-xl bg-red-50 text-red-500 hover:bg-red-100',
+  soft: 'rounded-full bg-green-50 text-green-800 hover:bg-green-100',
 }
 // sm : M03 레시피 추천 M16 다시 확인할게요 / 이대로 등록
 const SIZE_CLASS = {
@@ -31,7 +33,7 @@ function Button({
     <button
       {...props}
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-xl font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]} ${className}`}
     >
       {children}
     </button>

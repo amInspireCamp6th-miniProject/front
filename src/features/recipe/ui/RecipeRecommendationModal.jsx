@@ -46,15 +46,16 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
     onClose()
   }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
 
-  //모달이 열릴 때마다 임박 재료는 전부 선택된 상태로, 보유 재료 선택은 빈 상태로 시작
-  useEffect(() => {
-    if (!isOpen) return
-
-    setUrgentSelectedIds(
-      getIngredientIds(ingredients.filter((ingredient) => isUrgent(ingredient.daysLeft))),
-    )
-    setOwnedSelectedIds([])
-  }, [isOpen, ingredients])
+  //모달이 열리는 순간(isOpen false → true) 임박 재료는 전부 선택, 보유 재료 선택은 빈 상태로 시작
+  //effect 안에서 setState 하면 렌더가 한 번 더 도니까, "이전 prop 값을 기억해 두고 렌더 중에 비교" 하는 React 권장 패턴을 쓴다
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen)
+    if (isOpen) {
+      setUrgentSelectedIds(getIngredientIds(urgentIngredients))
+      setOwnedSelectedIds([])
+    }
+  }
 
   //선택 재료 id post 후 추천 레시피 통신
   async function handleRecommendation() {

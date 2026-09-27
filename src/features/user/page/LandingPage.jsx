@@ -1,25 +1,35 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
+import Button from '../../../components/ui/Button'
+
+// M01 랜딩
 function LandingPage() {
+  const navigate = useNavigate()
+
   return (
-    <div className="flex h-full flex-col justify-end gap-3 p-5">
-      <p className="mb-auto pt-20 text-center text-sm text-gray-400">랜딩 화면 자리</p>
+    <div className="flex h-full flex-col bg-gray-950 bg-[radial-gradient(circle_at_50%_35%,rgba(22,101,52,0.45),transparent_60%)] px-5 pb-10">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
+        <p className="text-sm font-medium tracking-[0.3em] text-green-200/70">FRIDGE RECIPE</p>
+        <h1 className="text-4xl leading-snug font-bold text-white">
+          냉장고 속 재료로,
+          <br />
+          오늘의 한 끼
+        </h1>
+        <p className="leading-relaxed text-gray-400">
+          버려지는 식재료 없이,
+          <br />더 맛있는 오늘을 만들어요
+        </p>
+      </div>
 
-      {/* <Link> 는 내부적으로 <a>로 만듦 >> 그래서 <a>의 inline 때문에 block으로 바꾸고 버튼역할 하게끔*/}
-      <Link
-        to="/login"
-        className="block rounded-lg bg-green-800 py-3 text-center text-sm text-white"
-      >
-        로그인
-      </Link>
-
-      <Link to="/signup" className="block rounded-lg bg-gray-100 py-3 text-center text-sm">
-        회원가입
-      </Link>
-
-      <Link to="/home" className="block py-1 text-center text-xs text-gray-400 underline">
-        둘러보기
-      </Link>
+      <div className="flex flex-col gap-3">
+        <Button onClick={() => navigate('/login')}>로그인</Button>
+        <Button variant="dark" onClick={() => navigate('/signup')}>
+          회원가입
+        </Button>
+        <Button variant="ghost" onClick={() => navigate('/home')}>
+          둘러보기
+        </Button>
+      </div>
     </div>
   )
 }

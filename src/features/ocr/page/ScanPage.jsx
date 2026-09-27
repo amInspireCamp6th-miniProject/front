@@ -72,7 +72,11 @@ function ScanPage() {
           <Icon name="camera" className="h-5 w-5" />
           촬영하기
         </Button>
-        <Button variant="outline" onClick={() => albumInputRef.current.click()} className="flex-1">
+        <Button
+          variant="outline"
+          onClick={() => albumInputRef.current.click()}
+          className="flex-1 px-3! text-sm!"
+        >
           <Icon name="inventory" className="h-5 w-5" />
           앨범에서 여러 장 선택
         </Button>

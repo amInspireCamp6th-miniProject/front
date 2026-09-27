@@ -1,26 +1,33 @@
 import { useEffect, useState, useCallback } from 'react'
 
+import Chip from '../../../components/ui/Chip.jsx'
+import ChipGroup from '../../../components/ui/ChipGroup.jsx'
 import Modal from '../../../components/ui/Modal.jsx'
-import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
-import getIngredients from '../../ingredient/api/ingredientApi.js'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
+import { formatDaysLeft, isUrgent } from '../../ingredient/model/daysLeft.js'
 import recommendRecipes from '../api/recipeApi.js'
 import Button from '../../../components/ui/Button.jsx'
 import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
 import RecipeRecommendationResult from './RecipeRecommendationResult.jsx'
 
-function RecipeRecommendationModal({ isOpen, onClose }) {
-  const [filter, setFilter] = useState('urgent') //필터 상태
-  const [ingredients, setIngredients] = useState([]) //ingredients 데이터 관리
-  const [isIngredientLoading, setIsIngredientLoading] = useState(false) //ingredients 로딩상태관리
-  const [ingredientError, setIngredientError] = useState(null) //ingredients 통신에러상태관리
+const FILTER_OPTIONS = [
+  { value: 'urgent', label: '임박 재료' },
+  { value: 'owned', label: '보유 재료' },
+]
 
-  const URGENT_DAYS_LIMIT = 5
+//선택된 재료의 ID를 가져오는 함수 (컴포넌트 밖: 상태를 안 쓰는 순수 함수라 effect 의존성에 안 들어가도 된다)
+function getIngredientIds(ingredients) {
+  return ingredients.map((ingredient) => ingredient.ingredientId)
+}
+
+// ingredients 는 페이지(HomePage, IngredientListPage)가 이미 불러온 목록을 그대로 넘겨준다
+function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
+  const [filter, setFilter] = useState('urgent') //필터 상태
 
   const [urgentSelectedIds, setUrgentSelectedIds] = useState([]) //uregent ingredient id
   const [ownedSelectedIds, setOwnedSelectedIds] = useState([]) //사용자 선택 ingredient id
 
-  const urgentIngredients = ingredients.filter(isUrgentIngredient) //uregent ingredien 값
+  const urgentIngredients = ingredients.filter((ingredient) => isUrgent(ingredient.daysLeft)) //uregent ingredien 값
 
   const [recommendationStatus, setRecommendationStatus] = useState('idle') //추천 상태 관리
   const [recommendedRecipes, setRecommendedRecipes] = useState([]) //추천 레시피 값
@@ -39,47 +46,16 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     onClose()
   }, [onClose, setFilter, setRecommendationStatus, setRecommendedRecipes, setRecommendationError])
 
-  //임박재료 구분 함수
-  function isUrgentIngredient(ingredient) {
-    return ingredient.daysLeft >= 0 && ingredient.daysLeft <= URGENT_DAYS_LIMIT
-  }
-
-  //선택된 재료의 ID를 가져오는 함수
-  function getIngredientIds(ingredients) {
-    return ingredients.map((ingredient) => ingredient.ingredientId)
-  }
-
-  //식료품 데이터 상세 조회 통신
-  useEffect(() => {
-    //modal을 컴포넌트로 쓰면 항상 open 상태라서 렌더링 상태 중단
-    if (!isOpen) return undefined
-
-    async function loadIngredients() {
-      try {
-        setIsIngredientLoading(true)
-        setIngredientError(null)
-
-        const data = await getIngredients()
-
-        setIngredients(data)
-        console.log('식재료 조회 결과:', data)
-
-        const urgentIds = getIngredientIds(data.filter(isUrgentIngredient))
-
-        setUrgentSelectedIds(urgentIds)
-        setOwnedSelectedIds([])
-      } catch (err) {
-        const errorResponse = err.response?.data
-        console.error('오류 코드:', errorResponse?.code)
-        console.error('오류 내용:', errorResponse?.message)
-        console.error('필드 오류:', errorResponse?.errors)
-      } finally {
-        setIsIngredientLoading(false)
-      }
+  //모달이 열리는 순간(isOpen false → true) 임박 재료는 전부 선택, 보유 재료 선택은 빈 상태로 시작
+  //effect 안에서 setState 하면 렌더가 한 번 더 도니까, "이전 prop 값을 기억해 두고 렌더 중에 비교" 하는 React 권장 패턴을 쓴다
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen)
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen)
+    if (isOpen) {
+      setUrgentSelectedIds(getIngredientIds(urgentIngredients))
+      setOwnedSelectedIds([])
     }
-
-    loadIngredients()
-  }, [isOpen])
+  }
 
   //선택 재료 id post 후 추천 레시피 통신
   async function handleRecommendation() {
@@ -160,19 +136,6 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
     }
   }
 
-  //d-day 표기 함수
-  function formatDaysLeft(daysLeft) {
-    if (daysLeft === 0) {
-      return 'D-Day'
-    }
-
-    if (daysLeft < 0) {
-      return `D+${Math.abs(daysLeft)}`
-    }
-
-    return `D-${daysLeft}`
-  }
-
   return (
     <Modal
       isOpen={isOpen}
@@ -182,13 +145,12 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       variant="bottomSheet"
       scrollMode="custom"
     >
-      <RecipeIngredientFilter value={filter} onChange={setFilter} />
-
-      {ingredientError && (
-        <p role="alert" className="mt-3 text-sm text-red-500">
-          {ingredientError}
-        </p>
-      )}
+      <ChipGroup
+        options={FILTER_OPTIONS}
+        value={filter}
+        onChange={setFilter}
+        aria-label="식재료 필터"
+      />
 
       {/* 재료 선택 제목 및 전체 선택/초기화 */}
       <div className="mt-3 flex items-center justify-between">
@@ -204,12 +166,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
           <span>|</span>
 
-          <button
-            type="button"
-            onClick={handleResetSelection}
-            disabled={isIngredientLoading}
-            className="disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button type="button" onClick={handleResetSelection}>
             초기화
           </button>
         </div>
@@ -227,15 +184,10 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
             }
 
             return (
-              <button
+              <Chip
                 key={ingredient.ingredientId}
-                type="button"
+                selected={isSelected}
                 onClick={() => handleIngredientToggle(ingredient.ingredientId)}
-                className={
-                  isSelected
-                    ? 'inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-2 text-white'
-                    : 'inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
-                }
               >
                 <span aria-hidden="true">{category.icon}</span>
 
@@ -243,7 +195,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
                 <span
                   className={
-                    isUrgentIngredient(ingredient)
+                    isUrgent(ingredient.daysLeft)
                       ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
                       : isSelected
                         ? 'text-xs text-green-100'
@@ -252,7 +204,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
                 >
                   {formatDaysLeft(ingredient.daysLeft)}
                 </span>
-              </button>
+              </Chip>
             )
           })}
         </div>
@@ -275,18 +227,9 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
       {/* 레시피 추천 버튼*/}
       <Button
-        type="button"
         onClick={handleRecommendation}
         disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
-        className="
-          mt-6 
-          w-full 
-          rounded-lg 
-          bg-green-700 
-          px-4 
-          py-3 
-          font-semibold 
-          text-white"
+        className="mt-6 w-full"
       >
         {recommendationStatus === 'loading'
           ? '추천 중...'

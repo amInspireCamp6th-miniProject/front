@@ -33,29 +33,11 @@ function OcrProductConfirmModal({
 
       {/* 버튼영역 */}
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <Button
-          className="
-                        h-12 
-                        rounded-xl 
-                        bg-gray-100 
-                        font-semibold 
-                        text-gray-600"
-          onClick={onRetry}
-          disabled={isSubmitting}
-        >
+        <Button variant="secondary" onClick={onRetry} disabled={isSubmitting}>
           다시 확인할게요
         </Button>
 
-        <Button
-          className="
-                        h-12 
-                        rounded-xl 
-                        bg-green-700 
-                        font-semibold 
-                        text-white"
-          onClick={onConfirm}
-          disabled={isSubmitting || products.length === 0}
-        >
+        <Button onClick={onConfirm} disabled={isSubmitting || products.length === 0}>
           {isSubmitting ? '등록 중...' : '이대로 등록'}
         </Button>
       </div>

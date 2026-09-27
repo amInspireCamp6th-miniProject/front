@@ -1,6 +1,6 @@
 import Spinner from '../../../components/ui/Spinner.jsx'
 
-function ScanLoading() {
+function ScanLoading({ photos = [] }) {
   return (
     <div
       className="
@@ -14,6 +14,17 @@ function ScanLoading() {
       role="status"
       aria-live="polite"
     >
+      <div className="flex max-w-[280px] flex-wrap justify-center gap-2">
+        {photos.map((photo, index) => (
+          <img
+            key={index}
+            src={URL.createObjectURL(photo)}
+            alt={`고른 사진 ${index + 1}`}
+            className="h-16 w-16 rounded-lg object-cover"
+          />
+        ))}
+      </div>
+
       {/* spinner 컴포넌트 사용 */}
       <Spinner />
 

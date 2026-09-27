@@ -32,6 +32,13 @@ const PATHS = {
     </>
   ),
   x: <path d="M18 6 6 18M6 6l12 12" />,
+  inventory: (
+    <>
+      <rect x="3" y="4" width="18" height="4" rx="1" />
+      <path d="M5 8v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8" />
+      <path d="M10 12h4" />
+    </>
+  ),
   plus: <path d="M12 5v14M5 12h14" />,
   chevronDown: <path d="m6 9 6 6 6-6" />,
   search: (

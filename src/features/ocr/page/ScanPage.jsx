@@ -68,17 +68,11 @@ function ScanPage() {
       />
 
       <div className="mb-1 mt-4 flex gap-2">
-        <Button
-          onClick={() => cameraInputRef.current.click()}
-          className="h-12 flex-1 gap-2 rounded-md bg-green-800 text-[15px] font-bold text-white"
-        >
+        <Button variant="primary" onClick={() => cameraInputRef.current.click()} className="flex-1">
           <Icon name="camera" className="h-5 w-5" />
           촬영하기
         </Button>
-        <Button
-          onClick={() => albumInputRef.current.click()}
-          className="h-12 flex-1 gap-2 rounded-md border border-gray-200 bg-white text-[14px] font-bold text-gray-900"
-        >
+        <Button variant="outline" onClick={() => albumInputRef.current.click()} className="flex-1">
           <Icon name="inventory" className="h-5 w-5" />
           앨범에서 여러 장 선택
         </Button>

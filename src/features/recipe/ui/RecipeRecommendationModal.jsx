@@ -1,7 +1,8 @@
 import { useEffect, useState, useCallback } from 'react'
 
+import Chip from '../../../components/ui/Chip.jsx'
+import ChipGroup from '../../../components/ui/ChipGroup.jsx'
 import Modal from '../../../components/ui/Modal.jsx'
-import RecipeIngredientFilter from './RecipeIngredientFilter.jsx'
 import getIngredients from '../../ingredient/api/ingredientApi.js'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap.js'
 import { formatDaysLeft, isUrgent } from '../../ingredient/model/daysLeft.js'
@@ -9,6 +10,11 @@ import recommendRecipes from '../api/recipeApi.js'
 import Button from '../../../components/ui/Button.jsx'
 import RecipeRecommendationLoading from './RecipeRecommendationLoading.jsx'
 import RecipeRecommendationResult from './RecipeRecommendationResult.jsx'
+
+const FILTER_OPTIONS = [
+  { value: 'urgent', label: '임박 재료' },
+  { value: 'owned', label: '보유 재료' },
+]
 
 function RecipeRecommendationModal({ isOpen, onClose }) {
   const [filter, setFilter] = useState('urgent') //필터 상태
@@ -165,7 +171,12 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
       variant="bottomSheet"
       scrollMode="custom"
     >
-      <RecipeIngredientFilter value={filter} onChange={setFilter} />
+      <ChipGroup
+        options={FILTER_OPTIONS}
+        value={filter}
+        onChange={setFilter}
+        aria-label="식재료 필터"
+      />
 
       {ingredientError && (
         <p role="alert" className="mt-3 text-sm text-red-500">
@@ -210,15 +221,10 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
             }
 
             return (
-              <button
+              <Chip
                 key={ingredient.ingredientId}
-                type="button"
+                selected={isSelected}
                 onClick={() => handleIngredientToggle(ingredient.ingredientId)}
-                className={
-                  isSelected
-                    ? 'inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-2 text-white'
-                    : 'inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-2 text-gray-700'
-                }
               >
                 <span aria-hidden="true">{category.icon}</span>
 
@@ -235,7 +241,7 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
                 >
                   {formatDaysLeft(ingredient.daysLeft)}
                 </span>
-              </button>
+              </Chip>
             )
           })}
         </div>
@@ -258,18 +264,9 @@ function RecipeRecommendationModal({ isOpen, onClose }) {
 
       {/* 레시피 추천 버튼*/}
       <Button
-        type="button"
         onClick={handleRecommendation}
         disabled={selectedIds.length === 0 || recommendationStatus === 'loading'}
-        className="
-          mt-6 
-          w-full 
-          rounded-lg 
-          bg-green-700 
-          px-4 
-          py-3 
-          font-semibold 
-          text-white"
+        className="mt-6 w-full"
       >
         {recommendationStatus === 'loading'
           ? '추천 중...'

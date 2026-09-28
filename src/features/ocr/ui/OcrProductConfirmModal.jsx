@@ -1,5 +1,4 @@
 import Button from '../../../components/ui/Button.jsx'
-import Icon from '../../../components/ui/Icon.jsx'
 import Modal from '../../../components/ui/Modal.jsx'
 
 function OcrProductConfirmModal({
@@ -20,16 +19,14 @@ function OcrProductConfirmModal({
 
       {/* 상품설명 */}
       <p className="text-sm leading-6 text-gray-500">
-        사진 속 문구(OCR)를 저장된 식재료명과 매칭했어요. 맞으면 이대로 등록할게요.
+        사진에서 인식한 상품명이에요. 맞으면 이대로 등록할게요.
       </p>
 
-      {/* 인식된 상품목록 표출: OCR 문구 › 매칭된 재료명 */}
+      {/* 인식 결과에서 사용자가 수정한 상품명만 보여준다 */}
       <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
         {products.map((product) => (
-          <div key={product.id} className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-4">
-            <span className="min-w-0 truncate text-sm text-gray-400">{product.productName}</span>
-            <Icon name="chevronRight" className="size-4 text-gray-400" />
-            <strong className="text-sm text-gray-900">{product.ingredientName}</strong>
+          <div key={product.id} className="rounded-xl bg-gray-50 px-4 py-4">
+            <strong className="block truncate text-sm text-gray-900">{product.productName}</strong>
           </div>
         ))}
       </div>

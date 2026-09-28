@@ -103,7 +103,9 @@ export async function updateIngredientImage(ingredientId, photo) {
   const formData = new FormData()
   formData.append('image', photo)
 
+  console.log(formData)
   const response = await api.put(`/api/v1/ingredients/${ingredientId}/image`, formData)
+  console.log(response)
 
   return fromIngredientResponse(response.data)
 }

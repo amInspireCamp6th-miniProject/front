@@ -136,7 +136,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
     } else {
       setOwnedSelectedIds([])
     }
-  } 
+  }
 
   return (
     <Modal

@@ -1,6 +1,7 @@
 import api from '../../../api/axios.js'
 import { findCategoryIdByName, INGREDIENT_CATEGORY } from '../model/categoryMap.js'
 import { calcDaysLeft } from '../model/daysLeft.js'
+import { toImageSrc } from '../model/image.js'
 
 // 프론트 값 → 명세 값. 백엔드가 냉동·실온 값을 확정하면 여기만 고친다
 const STORAGE_TYPE = {
@@ -25,6 +26,8 @@ function toIngredientRequest(values) {
     purchaseDate: values.purchaseDate,
     expirationDate: values.expiryDate,
     storageType: STORAGE_TYPE[values.storage],
+    // 사진은 base64 문자열. 수동 등록(M08)처럼 사진이 없으면 null 로 보낸다
+    imageUrl: values.imageUrl || null,
   }
 }
 
@@ -41,7 +44,7 @@ function fromIngredientResponse(item) {
     expiryDate: item.expirationDate,
     daysLeft: item.daysLeft ?? calcDaysLeft(item.expirationDate),
     storage: STORAGE_FROM_TYPE[item.storageType],
-    imageUrl: item.imageUrl,
+    imageUrl: toImageSrc(item.imageUrl),
   }
 }
 

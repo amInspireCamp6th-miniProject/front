@@ -8,6 +8,7 @@ import useScanStore from '../../../stores/useScanStore'
 import { createIngredient } from '../../ingredient/api/ingredientApi'
 import { findCategoryIdByName } from '../../ingredient/model/categoryMap'
 import { todayIso } from '../../ingredient/model/date'
+import { fileToDataUrl } from '../../ingredient/model/image'
 import OcrProductConfirmModal from '../ui/OcrProductConfirmModal'
 import ScanResultCard from '../ui/ScanResultCard'
 
@@ -15,7 +16,8 @@ import ScanResultCard from '../ui/ScanResultCard'
 function toFormItem(result, index) {
   return {
     id: index,
-    photoUrl: result.photo ? URL.createObjectURL(result.photo) : '',
+    photo: result.photo, // 원본 File. 등록할 때 base64 로 바꿔 보낸다
+    photoUrl: result.photo ? URL.createObjectURL(result.photo) : '', // 카드 썸네일 미리보기용
     productName: result.productName, // OCR 이 읽은 제품명 "한돈 삼겹살 500g"
     ingredientName: result.ingredientName, // 매칭된 재료명 "삼겹살". 카드에서 수정 가능
     categoryId: findCategoryIdByName(result.category),
@@ -75,7 +77,11 @@ function ScanResultPage() {
 
     try {
       await Promise.all(
-        items.map((item) => createIngredient({ ...item, purchaseDate: todayIso() })),
+        items.map(async (item) => {
+          const imageUrl = item.photo ? await fileToDataUrl(item.photo) : null
+
+          return createIngredient({ ...item, purchaseDate: todayIso(), imageUrl })
+        }),
       )
 
       setScanResults([])

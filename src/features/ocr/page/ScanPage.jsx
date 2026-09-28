@@ -5,12 +5,14 @@ import Icon from '../../../components/ui/Icon'
 import ScanLoading from '../ui/ScanLoading'
 import recognizeIngredients from '../api/ocrApi'
 import useScanStore from '../../../stores/useScanStore'
+import Toast from '../../../components/ui/Toast'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
   const [photos, setPhotos] = useState([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [showErrorToast, setShowErrorToast] = useState(false)
   const navigate = useNavigate()
   const setScanResults = useScanStore((state) => state.setScanResults)
 
@@ -21,22 +23,36 @@ function ScanPage() {
     setPhotos(files)
     e.target.value = ''
 
-    const data = await recognizeIngredients()
+    try {
+      const data = await recognizeIngredients()
 
-    const results = data.map((item, index) => ({
-      photo: files[index],
-      productName: item.productName,
-      ingredientName: item.ingredientName,
-      category: item.category,
-    }))
-    setScanResults(results)
-    navigate('/scan/result')
+      const results = data.map((item, index) => ({
+        photo: files[index],
+        productName: item.productName,
+        ingredientName: item.ingredientName,
+        category: item.category,
+      }))
+      setScanResults(results)
+      navigate('/scan/result')
+    } catch (error) {
+      console.error(error)
+      setShowErrorToast(true)
+      setTimeout(() => navigate('/ingredients/new'), 2000)
+    }
   }
 
-  if (isAnalyzing) return <ScanLoading photos={photos} />
+  if (isAnalyzing) {
+    return (
+      <>
+        <ScanLoading photos={photos} />
+        {showErrorToast && <Toast message="식재료 인식에 실패했어요" />}
+      </>
+    )
+  }
 
   return (
     <div className="px-5 pt-6">
+      {showErrorToast && <Toast message="식재료 인식에 실패했어요" />}
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6">
         <Icon name="camera" className="mb-1 h-14 w-14 text-gray-400" />
         <p className="text-center text-[15px] font-bold text-gray-900">

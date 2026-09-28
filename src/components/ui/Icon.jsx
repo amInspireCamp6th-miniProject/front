@@ -47,6 +47,13 @@ const PATHS = {
       <path d="m20 20-3.5-3.5" />
     </>
   ),
+  check: <path d="m5 12 5 5L20 7" />,
+  refresh: (
+    <>
+      <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+      <path d="M21 3v6h-6" />
+    </>
+  ),
 }
 
 export default function Icon({ name, className = 'h-5 w-5' }) {

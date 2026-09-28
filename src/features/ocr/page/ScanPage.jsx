@@ -1,31 +1,45 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
-import ScanLoading from '../ui/ScanLoading'
-import recognizeIngredients from '../api/ocrApi'
 import useScanStore from '../../../stores/useScanStore'
-import Toast from '../../../components/ui/Toast'
+import recognizeIngredients from '../api/ocrApi'
+import ScanLoading from '../ui/ScanLoading'
+
+// 백엔드 OCR 제한. 넘으면 400 이 나니 보내기 전에 막는다
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
   const [photos, setPhotos] = useState([])
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [showErrorToast, setShowErrorToast] = useState(false)
   const navigate = useNavigate()
   const setScanResults = useScanStore((state) => state.setScanResults)
 
   async function handleFiles(e) {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
+
+    const invalid = files.find(
+      (file) => !ALLOWED_TYPES.includes(file.type) || file.size > MAX_IMAGE_SIZE,
+    )
+    if (invalid) {
+      alert('JPG 또는 PNG, 5MB 이하 사진만 올릴 수 있어요.')
+      e.target.value = ''
+      return
+    }
+
     setIsAnalyzing(true)
     setPhotos(files)
     e.target.value = ''
 
     try {
-      const data = await recognizeIngredients()
+      const data = await recognizeIngredients(files)
 
+      // 응답 배열 순서 = 보낸 파일 순서. 그래서 index 로 사진과 결과를 짝짓는다
       const results = data.map((item, index) => ({
         photo: files[index],
         productName: item.productName,
@@ -35,24 +49,16 @@ function ScanPage() {
       setScanResults(results)
       navigate('/scan/result')
     } catch (error) {
-      console.error(error)
-      setShowErrorToast(true)
-      setTimeout(() => navigate('/ingredients/new'), 2000)
+      console.error('인식 실패:', error)
+      alert('재료 인식에 실패했어요. 다시 시도해주세요.')
+      setIsAnalyzing(false)
     }
   }
 
-  if (isAnalyzing) {
-    return (
-      <>
-        <ScanLoading photos={photos} />
-        {showErrorToast && <Toast message="식재료 인식에 실패했어요" />}
-      </>
-    )
-  }
+  if (isAnalyzing) return <ScanLoading photos={photos} />
 
   return (
     <div className="px-5 pt-6">
-      {showErrorToast && <Toast message="식재료 인식에 실패했어요" />}
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-6">
         <Icon name="camera" className="mb-1 h-14 w-14 text-gray-400" />
         <p className="text-center text-[15px] font-bold text-gray-900">
@@ -69,7 +75,7 @@ function ScanPage() {
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         capture="environment"
         className="hidden"
         onChange={handleFiles}
@@ -77,7 +83,7 @@ function ScanPage() {
       <input
         ref={albumInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         multiple
         className="hidden"
         onChange={handleFiles}

@@ -67,16 +67,10 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       setRecommendationStatus('loading')
       setRecommendationError(null)
 
-      console.log('추천 요청:', {
-        ingredientIds: selectedIds,
-      })
-
       const data = await recommendRecipes(selectedIds)
 
       setRecommendedRecipes(data)
       setRecommendationStatus('success')
-
-      console.log('추천 응답:', data)
     } catch (error) {
       const errorResponse = error.response?.data
 

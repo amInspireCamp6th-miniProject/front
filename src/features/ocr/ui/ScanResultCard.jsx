@@ -12,14 +12,23 @@ const CATEGORY_OPTIONS = Object.entries(INGREDIENT_CATEGORY).map(([value, { name
   label: name,
 }))
 
-// M07 카메라 인식 결과 1건. 이름·카테고리는 AI가 채워 오고, 소비기한만 사용자가 꼭 입력한다.
+// M07 카메라 인식 결과 1건. 재료명·카테고리는 AI가 채워 오고, 수량·소비기한은 사용자가 입력한다.
 // 값은 부모(ScanResultPage)가 들고 있고, 바뀌면 onChange(id, 이름, 값)으로 알려준다.
 function ScanResultCard({ item, error, onChange, onRemove }) {
-  const { id, photoUrl, ocrText, productName, categoryId, quantity, unit, expiryDate, storage } =
-    item
+  const {
+    id,
+    photoUrl,
+    productName,
+    ingredientName,
+    categoryId,
+    quantity,
+    unit,
+    expiryDate,
+    storage,
+  } = item
 
-  // OCR 문구("한돈 삼겹살 500g")와 매칭된 재료명("삼겹살")이 다를 때만 안내 문구를 보여준다
-  const isMatched = ocrText && ocrText !== productName
+  // OCR 제품명("한돈 삼겹살 500g")과 매칭된 재료명("삼겹살")이 다를 때만 안내 문구를 보여준다
+  const isMatched = productName && productName !== ingredientName
 
   function handleInputChange(event) {
     onChange(id, event.target.name, event.target.value)
@@ -37,18 +46,18 @@ function ScanResultCard({ item, error, onChange, onRemove }) {
 
       {isMatched && (
         <p className="text-xs text-gray-400">
-          OCR "{ocrText}" → "{productName}"로 자동 매칭됨
+          OCR "{productName}" → "{ingredientName}"로 자동 매칭됨
         </p>
       )}
 
       <div className="flex items-center gap-2">
         <Thumb src={photoUrl} />
         <Input
-          name="productName"
-          value={productName}
+          name="ingredientName"
+          value={ingredientName}
           onChange={handleInputChange}
-          placeholder="이름"
-          aria-label="이름"
+          placeholder="재료명"
+          aria-label="재료명"
           className="min-w-0 flex-1"
         />
         <Select
@@ -67,11 +76,13 @@ function ScanResultCard({ item, error, onChange, onRemove }) {
           name="quantity"
           type="number"
           min="0"
-          inputMode="numeric"
+          step="any"
+          inputMode="decimal"
           value={quantity}
           onChange={handleInputChange}
           placeholder="수량"
           aria-label="수량"
+          hasError={!quantity}
           className="min-w-0 flex-1"
         />
         <Select

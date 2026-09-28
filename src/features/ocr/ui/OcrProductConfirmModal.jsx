@@ -27,9 +27,9 @@ function OcrProductConfirmModal({
       <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
         {products.map((product) => (
           <div key={product.id} className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-4">
-            <span className="min-w-0 truncate text-sm text-gray-400">{product.ocrText}</span>
+            <span className="min-w-0 truncate text-sm text-gray-400">{product.productName}</span>
             <Icon name="chevronRight" className="size-4 text-gray-400" />
-            <strong className="text-sm text-gray-900">{product.productName}</strong>
+            <strong className="text-sm text-gray-900">{product.ingredientName}</strong>
           </div>
         ))}
       </div>

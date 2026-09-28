@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import BottomBar from '../../../components/layout/BottomBar'
 import Button from '../../../components/ui/Button'
@@ -8,6 +8,7 @@ import Select from '../../../components/ui/Select'
 import { INGREDIENT_CATEGORY } from '../model/categoryMap'
 import { UNIT_OPTIONS } from '../model/unit'
 import StorageSelector from './StorageSelector'
+import Icon from '../../../components/ui/Icon'
 
 const CATEGORY_OPTIONS = Object.entries(INGREDIENT_CATEGORY).map(([value, { name }]) => ({
   value,
@@ -38,6 +39,8 @@ function validate(values) {
 function IngredientForm({ initialValues, onSubmit, submitLabel }) {
   const [values, setValues] = useState({ ...EMPTY_VALUES, ...initialValues })
   const [errors, setErrors] = useState({})
+  const [photoFile, setPhotoFile] = useState(null)
+  const photoInputRef = useRef(null)
 
   function handleChange(name, value) {
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -46,6 +49,11 @@ function IngredientForm({ initialValues, onSubmit, submitLabel }) {
   // Input, Select 는 이벤트로 오니까 name/value 를 꺼내서 handleChange 로 넘긴다
   function handleInputChange(event) {
     handleChange(event.target.name, event.target.value)
+  }
+
+  function handlePhotoChange(e) {
+    const file = e.target.files[0]
+    if (file) setPhotoFile(file)
   }
 
   function handleSubmit(event) {
@@ -65,6 +73,33 @@ function IngredientForm({ initialValues, onSubmit, submitLabel }) {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex min-h-full flex-col">
       <div className="flex flex-col gap-5 px-5 py-6">
+        <Field label="사진">
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoChange}
+          />
+          <button
+            type="button"
+            onClick={() => photoInputRef.current.click()}
+            className="flex h-52 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-gray-400"
+          >
+            {photoFile ? (
+              <img
+                src={URL.createObjectURL(photoFile)}
+                alt="선택한 사진"
+                className="h-full w-full rounded-lg object-cover"
+              />
+            ) : (
+              <>
+                <Icon name="camera" className="h-6 w-6" />
+                <span className="text-[11px]">사진 추가</span>
+              </>
+            )}
+          </button>
+        </Field>
         <Field label="이름" htmlFor="productName" error={errors.productName}>
           <Input
             id="productName"

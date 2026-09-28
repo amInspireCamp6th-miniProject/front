@@ -185,7 +185,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       {/* 식재료 선택목록 */}
       <div
         className={`
-        mt-3 min-h-0 flex-auto overflow-y-auto overscroll-contain pr-1
+        mt-3 min-h-0 flex-auto overflow-x-hidden overflow-y-auto overscroll-contain pr-1
       `}
       >
         <div className="flex flex-wrap content-start gap-2">
@@ -202,18 +202,21 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
                 key={ingredient.ingredientId}
                 selected={isSelected}
                 onClick={() => handleIngredientToggle(ingredient.ingredientId)}
+                className="h-auto min-h-9 max-w-full py-2 whitespace-normal"
               >
-                <span aria-hidden="true">{category.icon}</span>
+                <span aria-hidden="true" className="shrink-0">
+                  {category.icon}
+                </span>
 
-                <span>{ingredient.productName}</span>
+                <span className="min-w-0 break-words text-left">{ingredient.productName}</span>
 
                 <span
                   className={
                     isUrgent(ingredient.daysLeft)
-                      ? 'rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
+                      ? 'shrink-0 rounded-full bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-600'
                       : isSelected
-                        ? 'text-xs text-green-100'
-                        : 'text-xs text-gray-500'
+                        ? 'shrink-0 text-xs text-green-100'
+                        : 'shrink-0 text-xs text-gray-500'
                   }
                 >
                   {formatDaysLeft(ingredient.daysLeft)}

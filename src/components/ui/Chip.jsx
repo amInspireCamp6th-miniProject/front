@@ -13,7 +13,7 @@ const VARIANT_CLASS = {
   },
 }
 
-function Chip({ selected = false, variant = 'pill', children, ...props }) {
+function Chip({ selected = false, variant = 'pill', children, className = '', ...props }) {
   const style = VARIANT_CLASS[variant]
 
   return (
@@ -21,7 +21,7 @@ function Chip({ selected = false, variant = 'pill', children, ...props }) {
       {...props}
       type="button"
       aria-pressed={selected}
-      className={`inline-flex items-center justify-center gap-1 font-medium ${style.base} ${selected ? style.selected : style.unselected}`}
+      className={`inline-flex items-center justify-center gap-1 font-medium ${style.base} ${selected ? style.selected : style.unselected} ${className}`}
     >
       {children}
     </button>

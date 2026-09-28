@@ -179,8 +179,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       {/* 식재료 선택목록 */}
       <div
         className={`
-        mt-3 min-h-0 overflow-y-auto overscroll-contain pr-1
-        ${hasRecommendationResult ? 'max-h-28 shrink-0' : 'flex-auto'}
+        mt-3 min-h-0 flex-auto overflow-y-auto overscroll-contain pr-1
       `}
       >
         <div className="flex flex-wrap content-start gap-2">
@@ -220,7 +219,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
       </div>
 
       {hasRecommendationResult && (
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+        <div className="shrink-0">
           {/* 레시피 추천 버튼 클릭 후 기다리는 상태 spinner*/}
           {recommendationStatus === 'loading' && <RecipeRecommendationLoading />}
 

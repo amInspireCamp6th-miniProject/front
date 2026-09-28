@@ -48,7 +48,6 @@ function IngredientEditPage() {
     purchaseDate,
     expiryDate,
     storage,
-    imageUrl,
   } = ingredient
 
   return (
@@ -62,7 +61,6 @@ function IngredientEditPage() {
         purchaseDate,
         expiryDate,
         storage,
-        imageUrl,
       }}
       onSubmit={handleSubmit}
       submitLabel="수정하기"

@@ -1,7 +1,6 @@
 import api from '../../../api/axios.js'
 import { findCategoryIdByName, INGREDIENT_CATEGORY } from '../model/categoryMap.js'
 import { calcDaysLeft } from '../model/daysLeft.js'
-import { toBase64Only, toImageSrc } from '../model/image.js'
 
 // 프론트 값 → 백엔드 StorageType enum 상수명 (백엔드 확인값)
 const STORAGE_TYPE = {
@@ -26,9 +25,9 @@ function toIngredientRequest(values) {
     purchaseDate: values.purchaseDate,
     expirationDate: values.expiryDate,
     storageType: STORAGE_TYPE[values.storage],
-    // 사진은 순수 base64 문자열. 수동 등록(M08)처럼 사진이 없으면 null.
-    // 백엔드 DTO 에 아직 이 필드가 없어서 지금은 무시된다(에러 없음). 백엔드 추가 요청 중
-    imageUrl: toBase64Only(values.imageUrl),
+    // 업로드용 순수 base64 문자열. 수동 등록(M08)처럼 사진이 없으면 null.
+    // 응답의 imageUrl(주소)과는 다른 값이라 필드명은 백엔드와 다시 정리 예정
+    imageUrl: values.imageBase64 ?? null,
   }
 }
 
@@ -45,7 +44,7 @@ function fromIngredientResponse(item) {
     expiryDate: item.expirationDate,
     daysLeft: item.daysLeft ?? calcDaysLeft(item.expirationDate),
     storage: STORAGE_FROM_TYPE[item.storageType],
-    imageUrl: toImageSrc(item.imageUrl),
+    imageUrl: item.imageUrl, // '/api/v1/ingredients/15/image' 형태 주소. 없으면 null
   }
 }
 

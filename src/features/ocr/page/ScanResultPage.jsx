@@ -78,9 +78,9 @@ function ScanResultPage() {
     try {
       await Promise.all(
         items.map(async (item) => {
-          const imageUrl = item.photo ? await fileToBase64(item.photo) : null
+          const imageBase64 = item.photo ? await fileToBase64(item.photo) : null
 
-          return createIngredient({ ...item, purchaseDate: todayIso(), imageUrl })
+          return createIngredient({ ...item, purchaseDate: todayIso(), imageBase64 })
         }),
       )
 

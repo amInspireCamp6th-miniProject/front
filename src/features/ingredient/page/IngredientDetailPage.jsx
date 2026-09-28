@@ -7,6 +7,7 @@ import Button from '../../../components/ui/Button'
 import DetailRow from '../../../components/ui/DetailRow'
 import Spinner from '../../../components/ui/Spinner'
 import { deleteIngredient } from '../api/ingredientApi'
+import useImageObjectUrl from '../hooks/useImageObjectUrl'
 import useIngredient from '../hooks/useIngredient'
 import { INGREDIENT_CATEGORY } from '../model/categoryMap'
 import { formatDate } from '../model/date'
@@ -18,6 +19,8 @@ function IngredientDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { ingredient, isLoading } = useIngredient(id)
+  // 훅은 조건문(if) 위에서 호출해야 해서, ingredient 가 아직 없을 땐 null 을 넘긴다
+  const imageSrc = useImageObjectUrl(ingredient?.imageUrl)
 
   async function handleDelete() {
     if (!window.confirm('이 식재료를 삭제할까요?')) return
@@ -43,24 +46,15 @@ function IngredientDetailPage() {
     return <p className="p-5 text-center text-gray-500">재료를 찾을 수 없어요</p>
   }
 
-  const {
-    productName,
-    categoryId,
-    imageUrl,
-    quantity,
-    unit,
-    purchaseDate,
-    expiryDate,
-    daysLeft,
-    storage,
-  } = ingredient
+  const { productName, categoryId, quantity, unit, purchaseDate, expiryDate, daysLeft, storage } =
+    ingredient
   const categoryName = INGREDIENT_CATEGORY[categoryId]?.name
 
   return (
     <div className="flex min-h-full flex-col">
       <div className="flex flex-col gap-5 px-5 py-6">
         <img
-          src={imageUrl || defaultImage}
+          src={imageSrc || defaultImage}
           alt={productName}
           className="aspect-square w-full rounded-2xl object-cover"
         />

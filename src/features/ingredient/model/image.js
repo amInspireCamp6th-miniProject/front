@@ -9,21 +9,3 @@ export function fileToBase64(file) {
     reader.readAsDataURL(file)
   })
 }
-
-// 백엔드에서 온 순수 base64 → <img src> 에 넣을 수 있게 접두어를 붙인다.
-// 이미 'data:...' 나 'http...' 로 시작하면 그대로 쓴다
-export function toImageSrc(value) {
-  if (!value) return ''
-  if (value.startsWith('data:') || value.startsWith('http')) return value
-
-  return `data:image/jpeg;base64,${value}`
-}
-
-// <img src> 용 값 → 요청용 순수 base64. 수정(PATCH) 때 조회한 값을 되돌려 보내는 데 쓴다.
-// 사진이 없으면 null
-export function toBase64Only(value) {
-  if (!value) return null
-  if (value.startsWith('data:')) return value.split(',')[1]
-
-  return value
-}

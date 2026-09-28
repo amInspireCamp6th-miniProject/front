@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import BottomBar from '../../../components/layout/BottomBar'
 import Button from '../../../components/ui/Button'
 import Field from '../../../components/ui/Field'
+import Icon from '../../../components/ui/Icon'
 import Input from '../../../components/ui/Input'
 import Select from '../../../components/ui/Select'
+import Thumb from '../../../components/ui/Thumb'
+import useImageObjectUrl from '../hooks/useImageObjectUrl'
 import { INGREDIENT_CATEGORY } from '../model/categoryMap'
+import { IMAGE_RULE_MESSAGE, isValidImageFile } from '../model/image'
 import { UNIT_OPTIONS } from '../model/unit'
 import StorageSelector from './StorageSelector'
 
@@ -15,6 +19,8 @@ const CATEGORY_OPTIONS = Object.entries(INGREDIENT_CATEGORY).map(([value, { name
 }))
 
 const EMPTY_VALUES = {
+  photo: null, // 새로 고른 사진 File. 등록은 사진 없이, 수정은 기존 사진 그대로 간다
+  imageUrl: null, // 수정(M10)일 때 이미 저장된 사진 주소. 새 사진을 안 고르면 이걸 미리보기로 쓴다
   productName: '',
   ingredientName: '',
   categoryId: '',
@@ -42,6 +48,17 @@ function validate(values) {
 function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = false }) {
   const [values, setValues] = useState({ ...EMPTY_VALUES, ...initialValues })
   const [errors, setErrors] = useState({})
+  const photoInputRef = useRef(null)
+
+  // 새로 고른 File 을 <img src> 에 넣을 임시 URL 로 바꾼다. File 이 바뀔 때만 다시 만든다
+  const newPhotoUrl = useMemo(
+    () => (values.photo ? URL.createObjectURL(values.photo) : ''),
+    [values.photo],
+  )
+  // 수정일 때 서버에 저장된 기존 사진. 토큰이 필요해서 훅으로 받아온다
+  const savedPhotoUrl = useImageObjectUrl(values.imageUrl)
+  // 새 사진이 있으면 그걸, 없으면 기존 사진을 보여준다
+  const photoUrl = newPhotoUrl || savedPhotoUrl
 
   function handleChange(name, value) {
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -50,6 +67,21 @@ function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = f
   // Input, Select 는 이벤트로 오니까 name/value 를 꺼내서 handleChange 로 넘긴다
   function handleInputChange(event) {
     handleChange(event.target.name, event.target.value)
+  }
+
+  // 파일 input 은 value 가 아니라 files 에 File 이 담긴다. 검사 통과한 것만 상태에 넣는다.
+  // input.value 를 비워야 같은 파일을 다시 골라도 change 이벤트가 난다
+  function handlePhotoChange(event) {
+    const file = event.target.files[0]
+    event.target.value = ''
+    if (!file) return
+
+    if (!isValidImageFile(file)) {
+      alert(IMAGE_RULE_MESSAGE)
+      return
+    }
+
+    handleChange('photo', file)
   }
 
   function handleSubmit(event) {
@@ -69,6 +101,31 @@ function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = f
   return (
     <form onSubmit={handleSubmit} noValidate className="flex min-h-full flex-col">
       <div className="flex flex-col gap-5 px-5 py-6">
+        {/* 사진은 선택 사항. 수정에서는 새 사진을 고른 경우에만 서버 사진이 바뀐다 */}
+        <Field label="사진 (선택)">
+          <div className="flex items-center gap-4">
+            <Thumb src={photoUrl} size="lg" />
+            <div className="flex flex-col items-start gap-2">
+              <Button variant="outline" onClick={() => photoInputRef.current.click()}>
+                <Icon name="camera" className="size-4" />
+                {photoUrl ? '다른 사진 선택' : '사진 선택'}
+              </Button>
+              {values.photo && (
+                <Button variant="ghost" onClick={() => handleChange('photo', null)}>
+                  선택 취소
+                </Button>
+              )}
+            </div>
+          </div>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/jpeg,image/png"
+            className="hidden"
+            onChange={handlePhotoChange}
+          />
+        </Field>
+
         <Field label="이름" htmlFor="productName" error={errors.productName}>
           <Input
             id="productName"

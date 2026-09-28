@@ -27,7 +27,8 @@ function IngredientDetailPage() {
 
     try {
       await deleteIngredient(id)
-      navigate('/ingredients')
+      // replace: 삭제된 상세로 뒤로가기해서 돌아오지 않게 히스토리에서 지운다
+      navigate('/ingredients', { replace: true })
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제에 실패했어요. 다시 시도해주세요.')

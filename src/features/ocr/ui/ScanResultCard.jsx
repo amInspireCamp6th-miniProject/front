@@ -53,11 +53,11 @@ function ScanResultCard({ item, error, onChange, onRemove }) {
       <div className="flex items-center gap-2">
         <Thumb src={photoUrl} />
         <Input
-          name="ingredientName"
-          value={ingredientName}
+          name="productName"
+          value={productName}
           onChange={handleInputChange}
-          placeholder="재료명"
-          aria-label="재료명"
+          placeholder="제품명"
+          aria-label="제품명"
           className="min-w-0 flex-1"
         />
         <Select

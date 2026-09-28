@@ -5,14 +5,8 @@ function PageHeader({ title }) {
   const navigate = useNavigate()
   return (
     <header className="flex h-14 shrink-0 items-center border-b border-gray-100 px-4">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        aria-label="뒤로 가기"
-        className="flex size-5 items-center justify-center rounded-full hover:bg-gray-100"
-      >
-        <IconButton icon="chevronLeft" aria-label="뒤로가기" onClick={() => navigate(-1)} />
-      </button>
+      {/* IconButton 이 이미 <button> 이라 바깥에 또 button 을 두면 클릭이 두 번 처리돼 두 번 뒤로 간다 */}
+      <IconButton icon="chevronLeft" aria-label="뒤로가기" onClick={() => navigate(-1)} />
       <h1 className="flex-1 text-center text-lg font-bold">{title}</h1>
       {/* title 중앙정렬용 */}
       <div className="size-5" />

@@ -4,12 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
 import useScanStore from '../../../stores/useScanStore'
+import { IMAGE_RULE_MESSAGE, isValidImageFile } from '../../ingredient/model/image'
 import recognizeIngredients from '../api/ocrApi'
 import ScanLoading from '../ui/ScanLoading'
-
-// 백엔드 OCR 제한. 넘으면 400 이 나니 보내기 전에 막는다
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024
-const ALLOWED_TYPES = ['image/jpeg', 'image/png']
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
@@ -23,11 +20,8 @@ function ScanPage() {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
 
-    const invalid = files.find(
-      (file) => !ALLOWED_TYPES.includes(file.type) || file.size > MAX_IMAGE_SIZE,
-    )
-    if (invalid) {
-      alert('JPG 또는 PNG, 5MB 이하 사진만 올릴 수 있어요.')
+    if (!files.every(isValidImageFile)) {
+      alert(IMAGE_RULE_MESSAGE)
       e.target.value = ''
       return
     }

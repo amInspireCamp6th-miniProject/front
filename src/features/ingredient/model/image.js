@@ -1,11 +1,9 @@
-// File 객체 → 순수 base64 문자열 '/9j/4AAQ...' (접두어 없음).
-// 백엔드가 byte[] 로 받아서, Jackson 이 base64 문자열을 바이트로 자동 변환한다.
-// 'data:image/jpeg;base64,' 접두어가 붙어 있으면 변환에 실패하니 떼고 보낸다
-export function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
+// 사진 파일 제한. 백엔드 OcrImageValidator 와 같은 값 (jpeg/png, 5MB).
+// 넘으면 서버가 400 을 주니 보내기 전에 프론트에서 먼저 막는다
+export const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png']
+export const IMAGE_RULE_MESSAGE = 'JPG 또는 PNG, 5MB 이하 사진만 올릴 수 있어요.'
+
+export function isValidImageFile(file) {
+  return ALLOWED_IMAGE_TYPES.includes(file.type) && file.size <= MAX_IMAGE_SIZE
 }

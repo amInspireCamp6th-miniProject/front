@@ -8,7 +8,6 @@ import useScanStore from '../../../stores/useScanStore'
 import { createIngredient } from '../../ingredient/api/ingredientApi'
 import { findCategoryIdByName } from '../../ingredient/model/categoryMap'
 import { todayIso } from '../../ingredient/model/date'
-import { fileToBase64 } from '../../ingredient/model/image'
 import OcrProductConfirmModal from '../ui/OcrProductConfirmModal'
 import ScanResultCard from '../ui/ScanResultCard'
 
@@ -16,7 +15,7 @@ import ScanResultCard from '../ui/ScanResultCard'
 function toFormItem(result, index) {
   return {
     id: index,
-    photo: result.photo, // 원본 File. 등록할 때 base64 로 바꿔 보낸다
+    photo: result.photo, // 원본 File. 등록할 때 multipart 로 그대로 보내 식재료 사진으로 저장된다
     photoUrl: result.photo ? URL.createObjectURL(result.photo) : '', // 카드 썸네일 미리보기용
     productName: result.productName, // OCR 이 읽은 제품명 "한돈 삼겹살 500g"
     ingredientName: result.ingredientName, // 매칭된 재료명 "삼겹살". 카드에서 수정 가능
@@ -32,7 +31,7 @@ function validate(items) {
   const errors = {}
 
   items.forEach((item) => {
-    if (!item.ingredientName.trim()) errors[item.id] = '재료명을 입력해주세요'
+    if (!item.productName.trim()) errors[item.id] = '재료명을 입력해주세요'
     else if (!item.categoryId) errors[item.id] = '카테고리를 선택해주세요'
     else if (!(Number(item.quantity) > 0)) errors[item.id] = '수량은 0보다 커야 해요'
     else if (!item.expiryDate) errors[item.id] = '소비기한을 입력해주세요'
@@ -71,21 +70,19 @@ function ScanResultPage() {
   }
 
   // M16 "이대로 등록": 카드 수만큼 등록 API 를 동시에 호출한다.
-  // 일괄 등록 API 가 없어서 단건 POST 를 Promise.all 로 묶었다. 하나라도 실패하면 catch 로 떨어진다
+  // 일괄 등록 API 가 없어서 단건 POST 를 Promise.all 로 묶었다. 하나라도 실패하면 catch 로 떨어진다.
+  // item.photo 가 들어 있으니 createIngredient 가 사진 포함 엔드포인트로 보낸다
   async function handleConfirm() {
     setIsSubmitting(true)
 
     try {
       await Promise.all(
-        items.map(async (item) => {
-          const imageBase64 = item.photo ? await fileToBase64(item.photo) : null
-
-          return createIngredient({ ...item, purchaseDate: todayIso(), imageBase64 })
-        }),
+        items.map((item) => createIngredient({ ...item, purchaseDate: todayIso() })),
       )
 
       setScanResults([])
-      navigate('/ingredients')
+      // replace: 결과가 비워진 이 화면으로 뒤로가기해서 돌아오지 않게 히스토리에서 지운다
+      navigate('/ingredients', { replace: true })
     } catch (error) {
       console.error('등록 실패:', error)
       alert('등록에 실패했어요. 다시 시도해주세요.')

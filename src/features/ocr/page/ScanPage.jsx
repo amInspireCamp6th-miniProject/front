@@ -21,16 +21,22 @@ function ScanPage() {
     setPhotos(files)
     e.target.value = ''
 
-    const data = await recognizeIngredients()
+    try {
+      const data = await recognizeIngredients()
 
-    const results = data.map((item, index) => ({
-      photo: files[index],
-      productName: item.productName,
-      ingredientName: item.ingredientName,
-      category: item.category,
-    }))
-    setScanResults(results)
-    navigate('/scan/result')
+      const results = data.map((item, index) => ({
+        photo: files[index],
+        productName: item.productName,
+        ingredientName: item.ingredientName,
+        category: item.category,
+      }))
+      setScanResults(results)
+      navigate('/scan/result')
+    } catch (error) {
+      console.error(error)
+      setIsAnalyzing(false)
+      navigate('/ingredients/new')
+    }
   }
 
   if (isAnalyzing) return <ScanLoading photos={photos} />

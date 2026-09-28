@@ -8,7 +8,7 @@ import useScanStore from '../../../stores/useScanStore'
 import { createIngredient } from '../../ingredient/api/ingredientApi'
 import { findCategoryIdByName } from '../../ingredient/model/categoryMap'
 import { todayIso } from '../../ingredient/model/date'
-import { fileToDataUrl } from '../../ingredient/model/image'
+import { fileToBase64 } from '../../ingredient/model/image'
 import OcrProductConfirmModal from '../ui/OcrProductConfirmModal'
 import ScanResultCard from '../ui/ScanResultCard'
 
@@ -78,7 +78,7 @@ function ScanResultPage() {
     try {
       await Promise.all(
         items.map(async (item) => {
-          const imageUrl = item.photo ? await fileToDataUrl(item.photo) : null
+          const imageUrl = item.photo ? await fileToBase64(item.photo) : null
 
           return createIngredient({ ...item, purchaseDate: todayIso(), imageUrl })
         }),

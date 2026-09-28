@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
-import ScanLoading from '../ui/ScanLoading'
-import recognizeIngredients from '../api/ocrApi'
 import useScanStore from '../../../stores/useScanStore'
+import recognizeIngredients from '../api/ocrApi'
+import ScanLoading from '../ui/ScanLoading'
 
 function ScanPage() {
   const cameraInputRef = useRef(null)
@@ -21,16 +22,23 @@ function ScanPage() {
     setPhotos(files)
     e.target.value = ''
 
-    const data = await recognizeIngredients()
+    try {
+      const data = await recognizeIngredients(files)
 
-    const results = data.map((item, index) => ({
-      photo: files[index],
-      productName: item.productName,
-      ingredientName: item.ingredientName,
-      category: item.category,
-    }))
-    setScanResults(results)
-    navigate('/scan/result')
+      // 응답 배열 순서 = 보낸 파일 순서. 그래서 index 로 사진과 결과를 짝짓는다
+      const results = data.map((item, index) => ({
+        photo: files[index],
+        productName: item.productName,
+        ingredientName: item.ingredientName,
+        category: item.category,
+      }))
+      setScanResults(results)
+      navigate('/scan/result')
+    } catch (error) {
+      console.error('인식 실패:', error)
+      alert('재료 인식에 실패했어요. 다시 시도해주세요.')
+      setIsAnalyzing(false)
+    }
   }
 
   if (isAnalyzing) return <ScanLoading photos={photos} />

@@ -1,10 +1,27 @@
-import useIngredients from './useIngredients'
+import { useEffect, useState } from 'react'
 
-// 재료 하나 조회. 지금은 더미가 목록만 있어서 목록에서 골라내고, 단건 API 가 생기면 그걸로 바꾼다.
+import { getIngredient } from '../api/ingredientApi'
+
+// 재료 하나 조회. 상세/수정 페이지에서 쓴다
 function useIngredient(id) {
-  const { ingredients, isLoading, error } = useIngredients()
+  const [ingredient, setIngredient] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const ingredient = ingredients.find((item) => String(item.ingredientId) === String(id)) ?? null
+  // id 가 바뀌면(다른 재료 페이지로 이동) 다시 불러온다
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getIngredient(id)
+        setIngredient(data)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    load()
+  }, [id])
 
   return { ingredient, isLoading, error }
 }

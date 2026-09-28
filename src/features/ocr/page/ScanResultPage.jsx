@@ -5,7 +5,9 @@ import BottomBar from '../../../components/layout/BottomBar'
 import Button from '../../../components/ui/Button'
 import Icon from '../../../components/ui/Icon'
 import useScanStore from '../../../stores/useScanStore'
+import { createIngredient } from '../../ingredient/api/ingredientApi'
 import { findCategoryIdByName } from '../../ingredient/model/categoryMap'
+import { todayIso } from '../../ingredient/model/date'
 import OcrProductConfirmModal from '../ui/OcrProductConfirmModal'
 import ScanResultCard from '../ui/ScanResultCard'
 
@@ -14,8 +16,8 @@ function toFormItem(result, index) {
   return {
     id: index,
     photoUrl: result.photo ? URL.createObjectURL(result.photo) : '',
-    ocrText: result.productName,
-    productName: result.ingredientName,
+    productName: result.productName, // OCR 이 읽은 제품명 "한돈 삼겹살 500g"
+    ingredientName: result.ingredientName, // 매칭된 재료명 "삼겹살". 카드에서 수정 가능
     categoryId: findCategoryIdByName(result.category),
     quantity: '',
     unit: '개',
@@ -28,7 +30,10 @@ function validate(items) {
   const errors = {}
 
   items.forEach((item) => {
-    if (!item.expiryDate) errors[item.id] = '소비기한을 입력해주세요'
+    if (!item.ingredientName.trim()) errors[item.id] = '재료명을 입력해주세요'
+    else if (!item.categoryId) errors[item.id] = '카테고리를 선택해주세요'
+    else if (!item.quantity) errors[item.id] = '수량을 입력해주세요'
+    else if (!item.expiryDate) errors[item.id] = '소비기한을 입력해주세요'
   })
 
   return errors
@@ -44,6 +49,7 @@ function ScanResultPage() {
   const [items, setItems] = useState(() => scanResults.map(toFormItem))
   const [errors, setErrors] = useState({})
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleChange(id, name, value) {
     setItems((prev) => prev.map((item) => (item.id === id ? { ...item, [name]: value } : item)))
@@ -62,23 +68,24 @@ function ScanResultPage() {
     setIsConfirmOpen(true)
   }
 
-  // M16 "이대로 등록": 실제 등록
-  function handleConfirm() {
-    const payload = items.map(
-      ({ productName, categoryId, quantity, unit, expiryDate, storage }) => ({
-        productName,
-        categoryId: Number(categoryId),
-        quantity: Number(quantity),
-        unit,
-        expiryDate,
-        storage,
-      }),
-    )
-    // TODO: 등록 API 연결 (createIngredients)
-    console.log('전체 등록 요청:', payload)
+  // M16 "이대로 등록": 카드 수만큼 등록 API 를 동시에 호출한다.
+  // 일괄 등록 API 가 없어서 단건 POST 를 Promise.all 로 묶었다. 하나라도 실패하면 catch 로 떨어진다
+  async function handleConfirm() {
+    setIsSubmitting(true)
 
-    setScanResults([])
-    navigate('/ingredients')
+    try {
+      await Promise.all(
+        items.map((item) => createIngredient({ ...item, purchaseDate: todayIso() })),
+      )
+
+      setScanResults([])
+      navigate('/ingredients')
+    } catch (error) {
+      console.error('등록 실패:', error)
+      alert('등록에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (items.length === 0) {
@@ -130,6 +137,7 @@ function ScanResultPage() {
         products={items}
         onRetry={() => setIsConfirmOpen(false)}
         onConfirm={handleConfirm}
+        isSubmitting={isSubmitting}
       />
     </div>
   )

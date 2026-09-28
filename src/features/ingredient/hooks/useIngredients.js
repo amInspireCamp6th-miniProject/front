@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import getIngredients from '../api/ingredientApi'
+import { getIngredients } from '../api/ingredientApi'
 
 function useIngredients() {
   const [ingredients, setIngredients] = useState([])

@@ -6,6 +6,7 @@ import Badge from '../../../components/ui/Badge'
 import Button from '../../../components/ui/Button'
 import DetailRow from '../../../components/ui/DetailRow'
 import Spinner from '../../../components/ui/Spinner'
+import { deleteIngredient } from '../api/ingredientApi'
 import useIngredient from '../hooks/useIngredient'
 import { INGREDIENT_CATEGORY } from '../model/categoryMap'
 import { formatDate } from '../model/date'
@@ -18,12 +19,16 @@ function IngredientDetailPage() {
   const navigate = useNavigate()
   const { ingredient, isLoading } = useIngredient(id)
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!window.confirm('이 식재료를 삭제할까요?')) return
 
-    // TODO: 삭제 API 연결 (deleteIngredient)
-    console.log('삭제 요청:', id)
-    navigate('/ingredients')
+    try {
+      await deleteIngredient(id)
+      navigate('/ingredients')
+    } catch (error) {
+      console.error('삭제 실패:', error)
+      alert('삭제에 실패했어요. 다시 시도해주세요.')
+    }
   }
 
   if (isLoading) {

@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import Spinner from '../../../components/ui/Spinner'
+import { updateIngredient } from '../api/ingredientApi'
 import useIngredient from '../hooks/useIngredient'
 import IngredientForm from '../ui/IngredientForm'
 
@@ -9,11 +11,20 @@ function IngredientEditPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { ingredient, isLoading } = useIngredient(id)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(values) {
-    // TODO: 수정 API 연결 (updateIngredient)
-    console.log('수정 요청:', id, values)
-    navigate(`/ingredients/${id}`)
+  async function handleSubmit(values) {
+    setIsSubmitting(true)
+
+    try {
+      await updateIngredient(id, values)
+      navigate(`/ingredients/${id}`)
+    } catch (error) {
+      console.error('수정 실패:', error)
+      alert('수정에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isLoading) {
@@ -28,13 +39,32 @@ function IngredientEditPage() {
     return <p className="p-5 text-center text-gray-500">재료를 찾을 수 없어요</p>
   }
 
-  const { productName, categoryId, quantity, unit, storage } = ingredient
+  const {
+    productName,
+    ingredientName,
+    categoryId,
+    quantity,
+    unit,
+    purchaseDate,
+    expiryDate,
+    storage,
+  } = ingredient
 
   return (
     <IngredientForm
-      initialValues={{ productName, categoryId, quantity, unit, storage }}
+      initialValues={{
+        productName,
+        ingredientName,
+        categoryId,
+        quantity,
+        unit,
+        purchaseDate,
+        expiryDate,
+        storage,
+      }}
       onSubmit={handleSubmit}
       submitLabel="수정하기"
+      isSubmitting={isSubmitting}
     />
   )
 }

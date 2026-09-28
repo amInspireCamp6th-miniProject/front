@@ -16,6 +16,7 @@ const CATEGORY_OPTIONS = Object.entries(INGREDIENT_CATEGORY).map(([value, { name
 
 const EMPTY_VALUES = {
   productName: '',
+  ingredientName: '',
   categoryId: '',
   quantity: '',
   unit: '개',
@@ -28,14 +29,16 @@ function validate(values) {
   const errors = {}
 
   if (!values.productName.trim()) errors.productName = '이름을 입력해주세요'
+  if (!values.ingredientName.trim()) errors.ingredientName = '재료명을 입력해주세요'
   if (!values.categoryId) errors.categoryId = '카테고리를 선택해주세요'
+  if (!values.purchaseDate) errors.purchaseDate = '구매일을 입력해주세요'
   if (!values.expiryDate) errors.expiryDate = '소비기한을 입력해주세요'
 
   return errors
 }
 
 // 등록(M08)과 수정(M10)이 같이 쓰는 폼. 초깃값과 제출 버튼 글자만 다르다.
-function IngredientForm({ initialValues, onSubmit, submitLabel }) {
+function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = false }) {
   const [values, setValues] = useState({ ...EMPTY_VALUES, ...initialValues })
   const [errors, setErrors] = useState({})
 
@@ -76,6 +79,18 @@ function IngredientForm({ initialValues, onSubmit, submitLabel }) {
           />
         </Field>
 
+        {/* 레시피 추천이 재료명으로 매칭하니 제품명과 따로 받는다 (예: "서울우유 1L" → "우유") */}
+        <Field label="재료명" htmlFor="ingredientName" error={errors.ingredientName}>
+          <Input
+            id="ingredientName"
+            name="ingredientName"
+            value={values.ingredientName}
+            onChange={handleInputChange}
+            placeholder="예: 우유"
+            hasError={Boolean(errors.ingredientName)}
+          />
+        </Field>
+
         <Field label="카테고리" htmlFor="categoryId" error={errors.categoryId}>
           <Select
             id="categoryId"
@@ -112,13 +127,14 @@ function IngredientForm({ initialValues, onSubmit, submitLabel }) {
           </Field>
         </div>
 
-        <Field label="구매일" htmlFor="purchaseDate">
+        <Field label="구매일" htmlFor="purchaseDate" error={errors.purchaseDate}>
           <Input
             id="purchaseDate"
             name="purchaseDate"
             type="date"
             value={values.purchaseDate}
             onChange={handleInputChange}
+            hasError={Boolean(errors.purchaseDate)}
           />
         </Field>
 
@@ -142,8 +158,8 @@ function IngredientForm({ initialValues, onSubmit, submitLabel }) {
       </div>
 
       <BottomBar>
-        <Button type="submit" className="w-full">
-          {submitLabel}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? '처리 중...' : submitLabel}
         </Button>
       </BottomBar>
     </form>

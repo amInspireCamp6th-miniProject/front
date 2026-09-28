@@ -76,7 +76,8 @@ function ScanResultCard({ item, error, onChange, onRemove }) {
           name="quantity"
           type="number"
           min="0"
-          inputMode="numeric"
+          step="any"
+          inputMode="decimal"
           value={quantity}
           onChange={handleInputChange}
           placeholder="수량"

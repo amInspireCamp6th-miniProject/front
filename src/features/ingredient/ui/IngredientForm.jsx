@@ -31,6 +31,7 @@ function validate(values) {
   if (!values.productName.trim()) errors.productName = '이름을 입력해주세요'
   if (!values.ingredientName.trim()) errors.ingredientName = '재료명을 입력해주세요'
   if (!values.categoryId) errors.categoryId = '카테고리를 선택해주세요'
+  if (!(Number(values.quantity) > 0)) errors.quantity = '수량은 0보다 커야 해요'
   if (!values.purchaseDate) errors.purchaseDate = '구매일을 입력해주세요'
   if (!values.expiryDate) errors.expiryDate = '소비기한을 입력해주세요'
 
@@ -104,16 +105,18 @@ function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = f
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="수량" htmlFor="quantity">
+          <Field label="수량" htmlFor="quantity" error={errors.quantity}>
             <Input
               id="quantity"
               name="quantity"
               type="number"
               min="0"
-              inputMode="numeric"
+              step="any"
+              inputMode="decimal"
               value={values.quantity}
               onChange={handleInputChange}
               placeholder="10"
+              hasError={Boolean(errors.quantity)}
             />
           </Field>
           <Field label="단위" htmlFor="unit">

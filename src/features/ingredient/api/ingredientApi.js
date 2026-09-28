@@ -3,11 +3,11 @@ import { findCategoryIdByName, INGREDIENT_CATEGORY } from '../model/categoryMap.
 import { calcDaysLeft } from '../model/daysLeft.js'
 import { toBase64Only, toImageSrc } from '../model/image.js'
 
-// 프론트 값 → 명세 값. 백엔드가 냉동·실온 값을 확정하면 여기만 고친다
+// 프론트 값 → 백엔드 StorageType enum 상수명 (백엔드 확인값)
 const STORAGE_TYPE = {
   FRIDGE: 'REFRIGERATED',
   FREEZER: 'FROZEN',
-  ROOM: 'ROOM_TEMPERATURE',
+  ROOM: 'ROOM_TEMP',
 }
 
 // 명세 값 → 프론트 값. STORAGE_TYPE 의 key/value 를 뒤집은 것
@@ -26,7 +26,8 @@ function toIngredientRequest(values) {
     purchaseDate: values.purchaseDate,
     expirationDate: values.expiryDate,
     storageType: STORAGE_TYPE[values.storage],
-    // 사진은 base64 문자열. 수동 등록(M08)처럼 사진이 없으면 null 로 보낸다
+    // 사진은 순수 base64 문자열. 수동 등록(M08)처럼 사진이 없으면 null.
+    // 백엔드 DTO 에 아직 이 필드가 없어서 지금은 무시된다(에러 없음). 백엔드 추가 요청 중
     imageUrl: toBase64Only(values.imageUrl),
   }
 }

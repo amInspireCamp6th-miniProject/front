@@ -34,7 +34,7 @@ function validate(items) {
   items.forEach((item) => {
     if (!item.ingredientName.trim()) errors[item.id] = '재료명을 입력해주세요'
     else if (!item.categoryId) errors[item.id] = '카테고리를 선택해주세요'
-    else if (!item.quantity) errors[item.id] = '수량을 입력해주세요'
+    else if (!(Number(item.quantity) > 0)) errors[item.id] = '수량은 0보다 커야 해요'
     else if (!item.expiryDate) errors[item.id] = '소비기한을 입력해주세요'
   })
 

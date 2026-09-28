@@ -7,6 +7,10 @@ import useScanStore from '../../../stores/useScanStore'
 import recognizeIngredients from '../api/ocrApi'
 import ScanLoading from '../ui/ScanLoading'
 
+// 백엔드 OCR 제한. 넘으면 400 이 나니 보내기 전에 막는다
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024
+const ALLOWED_TYPES = ['image/jpeg', 'image/png']
+
 function ScanPage() {
   const cameraInputRef = useRef(null)
   const albumInputRef = useRef(null)
@@ -18,6 +22,16 @@ function ScanPage() {
   async function handleFiles(e) {
     const files = Array.from(e.target.files)
     if (files.length === 0) return
+
+    const invalid = files.find(
+      (file) => !ALLOWED_TYPES.includes(file.type) || file.size > MAX_IMAGE_SIZE,
+    )
+    if (invalid) {
+      alert('JPG 또는 PNG, 5MB 이하 사진만 올릴 수 있어요.')
+      e.target.value = ''
+      return
+    }
+
     setIsAnalyzing(true)
     setPhotos(files)
     e.target.value = ''
@@ -61,7 +75,7 @@ function ScanPage() {
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         capture="environment"
         className="hidden"
         onChange={handleFiles}
@@ -69,7 +83,7 @@ function ScanPage() {
       <input
         ref={albumInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         multiple
         className="hidden"
         onChange={handleFiles}

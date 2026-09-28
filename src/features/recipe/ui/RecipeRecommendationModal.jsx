@@ -66,7 +66,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
     try {
       setRecommendationStatus('loading')
       setRecommendationError(null)
-     
+
       console.log(selectedIds)
       const data = await recommendRecipes(selectedIds)
       console.log(data)
@@ -77,13 +77,13 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
         return
       }
 
-    if (!Array.isArray(data)) {
-      throw new Error('잘못된 추천 응답 형식입니다.')
-    }
+      if (!Array.isArray(data)) {
+        throw new Error('잘못된 추천 응답 형식입니다.')
+      }
 
       setRecommendedRecipes(data)
       setRecommendationStatus('success')
-    } catch (error) { 
+    } catch (error) {
       const errorResponse = error.response?.data
 
       setRecommendationError(errorResponse?.message ?? '레시피 추천에 실패했습니다.')
@@ -237,9 +237,7 @@ function RecipeRecommendationModal({ isOpen, onClose, ingredients = [] }) {
           {/* 레시피 추천 이 없을때 */}
           {recommendationStatus === 'empty' && (
             <div className="mt-6 rounded-xl bg-gray-50 px-4 py-8 text-center">
-              <p className="font-semibold text-gray-800">
-                추천할 수 있는 레시피가 없어요
-              </p>
+              <p className="font-semibold text-gray-800">추천할 수 있는 레시피가 없어요</p>
 
               <p className="mt-2 text-sm text-gray-500">
                 다른 재료를 선택해서 다시 추천받아 주세요.

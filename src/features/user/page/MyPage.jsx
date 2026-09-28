@@ -1,11 +1,28 @@
+import { useNavigate } from 'react-router-dom'
+
 import Icon from '../../../components/ui/Icon'
 import MenuRow from '../../../components/ui/MenuRow'
+import useAuthStore from '../../../stores/useAuthStore'
+import { logout } from '../api/authApi'
 
 // M12 마이페이지
 function MyPage() {
-  function handleLogout() {
-    // TODO: 로그아웃 API 연결 후 /login 으로 이동
-    console.log('로그아웃')
+  const navigate = useNavigate()
+  const user = useAuthStore((state) => state.user)
+  const clearAuth = useAuthStore((state) => state.clearAuth)
+
+  // 서버 로그아웃이 실패해도(이미 만료된 토큰 등) 프론트 로그인 정보는 지우고 랜딩으로 보낸다
+  async function handleLogout() {
+    if (!window.confirm('로그아웃할까요?')) return
+
+    try {
+      await logout()
+    } catch (error) {
+      console.error('로그아웃 실패:', error)
+    } finally {
+      clearAuth()
+      navigate('/', { replace: true })
+    }
   }
 
   return (
@@ -15,8 +32,8 @@ function MyPage() {
           <Icon name="user" className="size-7" />
         </div>
         <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="truncate text-lg font-bold text-gray-900">김냉장님</p>
-          <p className="truncate text-sm text-gray-500">user@email.com</p>
+          <p className="truncate text-lg font-bold text-gray-900">{user?.nickname}님</p>
+          <p className="truncate text-sm text-gray-500">{user?.email}</p>
         </div>
       </div>
 

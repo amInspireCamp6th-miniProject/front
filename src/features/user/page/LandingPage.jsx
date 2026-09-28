@@ -1,10 +1,14 @@
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 import Button from '../../../components/ui/Button'
+import useAuthStore from '../../../stores/useAuthStore'
 
-// M01 랜딩
+// M01 랜딩. 이미 로그인돼 있으면 바로 홈으로 보낸다
 function LandingPage() {
   const navigate = useNavigate()
+  const accessToken = useAuthStore((state) => state.accessToken)
+
+  if (accessToken) return <Navigate to="/home" replace />
 
   return (
     <div className="flex h-full flex-col bg-gray-950 bg-[radial-gradient(circle_at_50%_35%,rgba(22,101,52,0.45),transparent_60%)] px-5 pb-10">

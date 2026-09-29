@@ -1,7 +1,8 @@
 import api from '../../../api/axios.js'
 
 // 식재료 이미지 인식 POST /api/v1/ocr/ingredients (백엔드 확인값)
-// 요청: multipart/form-data, 파트 이름 'image', 한 번에 1장. jpeg/png, 5MB 이하
+// 요청: multipart/form-data, 파트 이름 'image', 한 번에 1장. 전처리된 jpeg, 5MB 이하
+// ScanPage가 원본 대신 prepareImageForUpload의 반환 File을 넘기므로 API 경로·파트 이름·응답 구조는 기존과 같다.
 // 응답: { productName, ingredientName, category } 객체 1개. DB 저장 없음
 async function recognizeIngredient(imageFile) {
   const formData = new FormData()

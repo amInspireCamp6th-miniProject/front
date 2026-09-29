@@ -31,7 +31,8 @@ function toIngredientRequest(values) {
 // 사진까지 보내는 multipart 본문 (백엔드 확인값).
 // 'request' 파트: 등록 JSON. 스프링 @RequestPart 가 객체로 바꾸려면 파트의 Content-Type 이
 //   application/json 이어야 해서, 문자열 대신 type 을 붙인 Blob 으로 넣는다
-// 'image' 파트: 원본 File 그대로. jpeg/png, 5MB 이하
+// 'image' 파트: ScanResultPage가 보관한, OCR에 사용한 것과 동일한 전처리 JPEG File, 5MB 이하.
+// 이미지 전처리를 추가했지만 request/image 파트와 등록 API 경로는 기존 계약을 그대로 유지한다.
 function toIngredientFormData(values) {
   const formData = new FormData()
   formData.append(

@@ -15,8 +15,9 @@ import ScanResultCard from '../ui/ScanResultCard'
 function toFormItem(result, index) {
   return {
     id: index,
-    photo: result.photo, // 원본 File. 등록할 때 multipart 로 그대로 보내 식재료 사진으로 저장된다
-    photoUrl: result.photo ? URL.createObjectURL(result.photo) : '', // 카드 썸네일 미리보기용
+    // OCR에 보낸 전처리 JPEG를 그대로 폼에 넘겨 등록할 때도 같은 File 객체를 보낸다.
+    // 기존 photoUrl 생성은 제거 시 회수하기 어려워 삭제했고, ScanResultCard의 useObjectUrl이 미리보기 URL 생성·해제를 대신한다.
+    photo: result.photo,
     productName: result.productName, // OCR 이 읽은 제품명 "한돈 삼겹살 500g"
     ingredientName: result.ingredientName, // 매칭된 재료명 "삼겹살". 카드에서 수정 가능
     categoryId: findCategoryIdByName(result.category),

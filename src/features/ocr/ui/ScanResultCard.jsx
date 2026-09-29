@@ -3,6 +3,7 @@ import IconButton from '../../../components/ui/IconButton'
 import Input from '../../../components/ui/Input'
 import Select from '../../../components/ui/Select'
 import Thumb from '../../../components/ui/Thumb'
+import useObjectUrl from '../../../hooks/useObjectUrl'
 import { INGREDIENT_CATEGORY } from '../../ingredient/model/categoryMap'
 import { UNIT_OPTIONS } from '../../ingredient/model/unit'
 import StorageSelector from '../../ingredient/ui/StorageSelector'
@@ -17,7 +18,7 @@ const CATEGORY_OPTIONS = Object.entries(INGREDIENT_CATEGORY).map(([value, { name
 function ScanResultCard({ item, error, onChange, onRemove }) {
   const {
     id,
-    photoUrl,
+    photo,
     productName,
     ingredientName,
     categoryId,
@@ -26,6 +27,9 @@ function ScanResultCard({ item, error, onChange, onRemove }) {
     expiryDate,
     storage,
   } = item
+  // 부모가 생성하던 photoUrl 필드를 제거하고 File에서 카드 수명에 맞는 URL을 만든다.
+  // 사용자가 카드를 제거하거나 페이지를 이동하면 훅의 cleanup이 URL을 반납한다.
+  const photoUrl = useObjectUrl(photo)
 
   // OCR 제품명("한돈 삼겹살 500g")과 매칭된 재료명("삼겹살")이 다를 때만 안내 문구를 보여준다
   const isMatched = productName && productName !== ingredientName

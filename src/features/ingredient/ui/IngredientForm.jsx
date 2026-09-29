@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import BottomBar from '../../../components/layout/BottomBar'
 import Button from '../../../components/ui/Button'
@@ -7,6 +7,7 @@ import Icon from '../../../components/ui/Icon'
 import Input from '../../../components/ui/Input'
 import Select from '../../../components/ui/Select'
 import Thumb from '../../../components/ui/Thumb'
+import useObjectUrl from '../../../hooks/useObjectUrl'
 import useImageObjectUrl from '../hooks/useImageObjectUrl'
 import { INGREDIENT_CATEGORY } from '../model/categoryMap'
 import { IMAGE_RULE_MESSAGE, isValidImageFile } from '../model/image'
@@ -51,10 +52,9 @@ function IngredientForm({ initialValues, onSubmit, submitLabel, isSubmitting = f
   const photoInputRef = useRef(null)
 
   // 새로 고른 File 을 <img src> 에 넣을 임시 URL 로 바꾼다. File 이 바뀔 때만 다시 만든다
-  const newPhotoUrl = useMemo(
-    () => (values.photo ? URL.createObjectURL(values.photo) : ''),
-    [values.photo],
-  )
+  // 기존 useMemo는 URL을 생성하기만 하고 해제하지 않아, 새 사진 선택이 반복되면 메모리가 남을 수 있었다.
+  // 공용 훅으로 대체해 File이 바뀌거나 폼이 사라질 때 Object URL을 반납한다.
+  const newPhotoUrl = useObjectUrl(values.photo)
   // 수정일 때 서버에 저장된 기존 사진. 토큰이 필요해서 훅으로 받아온다
   const savedPhotoUrl = useImageObjectUrl(values.imageUrl)
   // 새 사진이 있으면 그걸, 없으면 기존 사진을 보여준다
